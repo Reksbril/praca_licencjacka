@@ -34,6 +34,7 @@ def test_homomorphic_to_transitive():
     P.add_path(range(10))
     assert homomorphic_to_transitive(P) == 10
 
+
 @pytest.mark.parametrize("T", [
     DiGraph([(0, 1), (1, 2), (2, 0), (1, 3)]), # nie jest turniejem
     digraphs.TransitiveTournament(4), # jest turniejem bez cykli
@@ -44,8 +45,37 @@ def test_one_cycle_wrong_T_argument(T):
     with pytest.raises(ValueError):
         is_homomorphic_one_cycle(G, T)
 
-def test_one_cycle_G_homomorphic_to_G():
-    #G = DiGraph([(0, 1), (1, 2), (2, 0)])
-    #T = DiGraph([(0, 1), (1, 2), (2, 0)]) # G == T
-    #assert is_homomorphic_one_cycle(G, T)
-    pass
+
+def test_homomorphic_to_C_three_simple():
+    G = DiGraph([
+        (0, 1), (1, 2),
+        (3, 4), (4, 5)
+    ], format='list_of_edges')
+    assert is_homomorphic_to_C_three(G)
+
+
+def test_homomorphic_to_C_three_path():
+    G = DiGraph()
+    G.add_path(range(10))
+    assert is_homomorphic_to_C_three(G)
+
+
+def test_not_homomorphic_to_C_three_simple():
+    G = DiGraph([
+        (0, 1), (1, 2), (0, 2)
+    ], format='list_of_edges')
+    assert not is_homomorphic_to_C_three(G)
+
+
+def test_homomorphic_to_T_one_cycle_simple():
+    T = DiGraph([
+        (0, 1), (1, 2), (2, 0),
+        (0, 3), (1, 3), (2, 3),
+        (4, 0), (4, 1), (4, 2), (4, 3)
+    ], format='list_of_edges')
+    G = DiGraph([
+        (3, 5)
+    ], format='list_of_edges')
+    G.add_path([6, 0, 1, 2, 3, 4, 5])
+
+    assert is_homomorphic_one_cycle(G, T)

@@ -1,6 +1,8 @@
 import sage.all
 from sage.graphs.digraph import DiGraph
 
+from src.DiGraphExtended import DiGraphExtended
+
 '''
 Plik zawierający funkcje pomocnicze
 '''
@@ -66,19 +68,36 @@ def tournament_with_one_cycle(k, sink):
 
     for i, flag in enumerate(sink):
         if flag:
-            add_source(T, i + 3)
-        else:
             add_sink(T, i + 3)
+        else:
+            add_source(T, i + 3)
 
     return T
 
 
 def rm_sinks_and_sources(G, T):
-    '''Usuwa wszytkie źródła i ujścia z grafu G i turnieju T.
-    T powinien mieć dokładnie jeden cykl skierowany, a G musi
-    być acykliczny. Oba grafy powinny być typu DiGraphExtended.
+    '''Zwraca kopię grafu G, która ma usunięte wszystkie źródła
+    i ujścia, zgodnie z uwagą pod Algorytmem 2 w [1].
     '''
-    pass
+
+    exG = DiGraphExtended(G, keep_removed=True)
+    exT = DiGraphExtended(T)
+
+    while True:
+        if len(exT.sources()) > 0:
+            next_step = 'source'
+        elif len(exT.sinks()) > 0:
+            next_step = 'sink'
+        else:
+            return exG.get_current()
+
+        exT.step(next_step)
+        try:
+            exG.step(next_step)
+        except RuntimeError:
+            pass
+
+
 
 
 #TODO usunąć

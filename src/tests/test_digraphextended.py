@@ -26,36 +26,36 @@ def test_extended_tournament(case):
 
 
 def test_sinks_sources_simple():
-    G = DiGraph()
-    G.add_edge(0, 1)
+    G = DiGraph([
+        (0, 1)
+    ], format='list_of_edges')
     ex = DiGraphExtended(G)
 
     assert ex.sources() == [0]
     assert ex.sinks() == [1]
 
 def test_sinks_then_source():
-    G = DiGraph()
-    G.add_edge(0, 1)
-    G.add_edge(0, 2)
+    G = DiGraph([
+        (0, 1), (0, 2)
+    ], format='list_of_edges')
     ex = DiGraphExtended(G)
     assert ex.step('sink') == [0]
 
 def test_sinks_then_source_duplicates():
-    G = DiGraph()
-    G.add_vertex(0)
-    G.add_edge(1, 2)
+    G = DiGraph([
+        [0, 1, 2], #wierzchołki
+        [(1, 2)] #krawędzie
+    ], format='vertices_and_edges')
     ex = DiGraphExtended(G)
     ex.step('sink')
     assert ex.sources() == [1]
 
 def test_get_current():
-    G = DiGraph()
-    G.add_edges([(0, 1), (1, 2), (1, 3), (1, 4)])
+    G = DiGraph(
+        [(0, 1), (1, 2), (1, 3), (1, 4)],
+        format='list_of_edges')
     ex = DiGraphExtended(G, keep_removed=True)
     ex.step('sink')
-
     result = ex.get_current()
-    expected = DiGraph()
-    expected.add_edges([(0, 1)])
-
+    expected = DiGraph([(0, 1)], format='list_of_edges')
     assert result == expected
