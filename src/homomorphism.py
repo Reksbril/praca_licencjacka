@@ -2,11 +2,17 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 
 from src.helpers import *
+from src.DiGraphExtended import DiGraphExtended
 
+
+def is_homomorphic_to_C_three(G):
+    '''Sprawdza, czy graf G jest homomorficzny z C_3
+    '''
+    pass
 
 def is_homomorphic_one_cycle(G, T):
-    '''Funkcja zwraca True wtw G jest homomorficzny z turniejem
-    T. T musi zawierać dokładnie jeden cykl skierowany. W
+    '''Sprawdza czy G jest homomorficzny z turniejem T.
+    T musi zawierać dokładnie jeden cykl skierowany. W
     przeciwnym przypadku rzucany jest ValueError
     '''
     if not G.is_directed_acyclic():
@@ -14,7 +20,13 @@ def is_homomorphic_one_cycle(G, T):
     if not has_exactly_one_cycle(T) or not T.is_tournament():
         raise ValueError("T musi być turniejem i zawierać dokładnie "
                          "jeden cykl skierowany.")
-    pass
+
+    extG = DiGraphExtended(G)
+    extT = DiGraphExtended(T)
+
+    rm_sinks_and_sources(extG, extT)
+    #to co zostało, to pewien graf G, oraz T będący cyklem C_3
+    return is_homomorphic_to_C_three(G)
 
 
 def is_homomorphic_to_transitive_k(G, k):
@@ -28,23 +40,17 @@ def is_homomorphic_to_transitive_k(G, k):
     colors = dict() #kolory przyporządkowane wierzchołkom
     color = k #obecny kolor
     vertices = G.sinks() #wierzchołki, które w danym obrocie pętli będą kolorowane
-    out_degrees = G.out_degree(labels=True)
+    ex = DiGraphExtended(G)
 
     while len(vertices) > 0 and color > 0:
-        next_vertices = []
         for v in vertices:
             #jeżeli wierzchołek ma już kolor, to sprzeczność
             #TODO raczej nie będzie zachodzić, ale na razie zostawię
             if v in colors:
                 return False
             colors[v] = color
-            #bierzemy sąsiadów v, którzy po usunięciu v staną się "ujściami"
-            for in_neigh in G.neighbors_in(v):
-                out_degrees[in_neigh] -= 1
-                if out_degrees[in_neigh] == 0:
-                    next_vertices.append(in_neigh)
         color -= 1
-        vertices = next_vertices
+        vertices = ex.step('sink')
 
     return len(colors) == len(G.vertices())
 

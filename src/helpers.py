@@ -7,7 +7,7 @@ Plik zawierający funkcje pomocnicze
 
 
 def iterator_has_exactly_one_element(it):
-    '''Zwraca True wtw it ma dokładnie jeden element.
+    '''Zwraca True wtw iterator it ma dokładnie jeden element.
     '''
     try:
         next(it)
@@ -35,20 +35,15 @@ def tournament_with_one_cycle(k, sink):
     dodawanie do C_3 kolejnych wierzchołków, które w danym momencie
     będą źródłami bądź ujściami ([1], komentarz pod Algorytmem 2).
 
-    Parameters
-    ----------
-    k : integer
+    :param k: Int
         Liczba wierzchołków w turnieju
-    dirs : boolean array
+    :param sink: Bool array
         Kontroluje, w jaki sposób mają być skierowane kolejne krawędzie.
         Jeżeli dirs[i] == True, to wszystkie krawędzie łączące wierzchołek
         i z wierzchołkami o niższych indeksach, będą skierowane w stronę i
         (tzn. i wtedy będzie ujściem).
         Rozmiar dirs powinien być równy k - 3
-
-    Returns
-    -------
-    T : DiGraph
+    :return: DiGraph
         Turniej o k wierzchołkach, zawierający dokładnie jeden cykl.
     '''
     if not isinstance(k, int) or k < 3:
@@ -76,6 +71,14 @@ def tournament_with_one_cycle(k, sink):
             add_sink(T, i + 3)
 
     return T
+
+
+def rm_sinks_and_sources(G, T):
+    '''Usuwa wszytkie źródła i ujścia z grafu G i turnieju T.
+    T powinien mieć dokładnie jeden cykl skierowany, a G musi
+    być acykliczny. Oba grafy powinny być typu DiGraphExtended.
+    '''
+    pass
 
 
 #TODO usunąć
