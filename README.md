@@ -1,5 +1,8 @@
 # Praca licencjacka
 
+Repozytorium implementacji algorytmu stanowiącego część pracy licencjackiej. 
+Wykorzystuje bibliotekę [SAGE](http://doc.sagemath.org/html/en/index.html).
+
 ## Algorytm
 Wejście: graf skierowany *G* \
 Wyjście: compressibility number dla *G* tzn. najmniejsze *k* takie że *G* jest homomorficzny z każdym turniejem na *k* 
