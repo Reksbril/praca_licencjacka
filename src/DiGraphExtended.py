@@ -67,7 +67,6 @@ class DiGraphExtended():
         self.vertices[rm_type] = list(
             set(self.vertices[rm_type]) - set(self.vertices[other]))
 
-
     def _get_neighbors(self, rm_type, v):
         '''W zależności od rm_type, zwraca wierzchołki wychodzące
         lub wchodzące do wierzchołka v.
@@ -90,7 +89,6 @@ class DiGraphExtended():
         if not self.keep_removed:
             raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
                              "zapamiętane usunięte wierzchołki.")
-
 
         G = copy(self.G)
         G.delete_vertices(self.removed)

@@ -21,6 +21,7 @@ def iterator_has_exactly_one_element(it):
         return True
     return False
 
+
 def has_exactly_one_cycle(G):
     '''Zwraca True wtw G jest grafem skierowanym o dokładnie
     jednym cyklu skierowanym.
@@ -96,8 +97,6 @@ def rm_sinks_and_sources(G, T):
             exG.step(next_step)
         except RuntimeError:
             pass
-
-
 
 
 #TODO usunąć

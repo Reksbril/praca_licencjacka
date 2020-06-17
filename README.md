@@ -8,7 +8,7 @@ wierzchołkach
 1. Szukamy *i* takiego że nasz graf jest homomorficzny z turniejem tranzytywnym na *i* wierzchołkach.
 2. Zaczynając od *i*, szukamy najmniejszego *j* takiego, że *G* jest homomorficzny z turniejem na *j* wierzchołkach, 
 który ma dokładnie jeden cykl skierowany.
-3. Zaczynając od *j*, szukamy najmniejszego *k* takiego, że *G* jest homomorficzny z turniejem
+3. Zaczynając od *j*, szukamy najmniejszego *k* takiego, że *G* jest homomorficzny z każdym turniejem
 
 
 ##### AD 1

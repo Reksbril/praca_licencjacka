@@ -2,7 +2,6 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
-
 from src.helpers import *
 
 
@@ -14,6 +13,7 @@ def is_homomorphic_to_C_three(G):
         if not connected_is_homomorphic_to_C_three(H):
             return False
     return True
+
 
 def connected_is_homomorphic_to_C_three(G):
     '''Sprawdza czy spójny G jest homomorficzny z C_3. Implementacja
