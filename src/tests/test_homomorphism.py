@@ -79,3 +79,39 @@ def test_homomorphic_to_T_one_cycle_simple():
     G.add_path([6, 0, 1, 2, 3, 4, 5])
 
     assert is_homomorphic_one_cycle(G, T)
+
+
+@pytest.mark.parametrize("case", [
+    ([(0, 1), (1, 2),(3, 4), (4, 5)], True),
+    ([(0, 1), (1, 2),(3, 4), (4, 5), (5, 6), (6, 7), (7, 8)], True),
+    ([(0, 1), (1, 2), (0, 2)], False)
+])
+def test_homomorphic_to_tournament_C_three(case):
+    G = DiGraph(case[0], format='list_of_edges')
+    T = DiGraph([(0, 1), (1, 2), (2, 0)], format='list_of_edges')
+    assert homomorphic_to_tournament(G, T) == case[1]
+
+
+def test_tree_homomorphic_to_tournaments():
+    G = DiGraph([(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4),
+                 (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
+                format='list_of_edges')
+    for T in digraphs.tournaments_nauty(5):
+        assert homomorphic_to_tournament(G, T)
+
+@pytest.mark.parametrize('k', [3, 4])
+def test_tree_not_homomorphic_to_transitive(k):
+    G = DiGraph([(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4),
+                 (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
+                format='list_of_edges')
+    T = digraphs.TransitiveTournament(k)
+    assert not homomorphic_to_tournament(G, T)
+
+
+@pytest.mark.parametrize('edges', [
+    [(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4), (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
+])
+@pytest.mark.parametrize('expected', [5])
+def test_compressibility(edges, expected):
+    G = DiGraph(edges)
+    assert compressibility_number(G) == expected

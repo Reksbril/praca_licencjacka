@@ -1,8 +1,11 @@
 import sage.all
 from sage.graphs.digraph import DiGraph
+from sage.graphs.digraph_generators import digraphs
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
 from src.helpers import *
+
+from copy import deepcopy
 
 
 def is_homomorphic_to_C_three(G):
@@ -98,3 +101,69 @@ def homomorphic_to_transitive(G):
         if is_homomorphic_to_transitive_k(G, k):
             return k
         k += 1
+
+
+def homomorphic_to_tournament(G, T):
+    '''Funkcja sprawdzająca, czy G jest homomorficzny z dowolnym turniejem T. Jeżeli T ma mniej niż 2 cykle, powinniśmy
+    używać powyżej zaimplementowanych metod
+    :param G: Dowolny graf skierowany, acykliczny
+    :param T: Dowolny turniej
+    :return: True wtw G jest homomorficzny z T
+    '''
+    G, T = rm_sinks_and_sources(G, T, True)
+    if len(T.vertices()) == 0:
+        return len(G.vertices()) == 0
+    sorted_G = G.topological_sort()
+
+    def assign(i, A):
+        if i == len(sorted_G) - 1:
+            # W tym przypadku lista A[v] jest niepusta, więc istnieje dopasowanie dla v.
+            return True
+        v = sorted_G[i]
+        for w in A[v]:
+            A_copy = deepcopy(A)
+            L = set(T.neighbors_out(w))
+            for z in G.neighbors_out(v):
+                A_copy[z] = A_copy[z] & L
+                if len(A_copy[z]) == 0:
+                    return False
+            if assign(i + 1, A_copy):
+                return True
+        return False
+
+
+    A = {v: set(T.vertices()) for v in G.vertices()}
+    return assign(0, A)
+
+
+def compressibility_number(G):
+    '''Fukcja implementująca główny algrytm.
+    :param G: Graf skierowany
+    :return: Compressibility number dla G
+    '''
+    T = []
+    i = homomorphic_to_transitive(G)
+    T.append(digraphs.TransitiveTournament(i))
+
+    def check_homomorphism(is_homomorphic_method, graphs_filter):
+        nonlocal i
+        while True:
+            found_not_homomorphic = False
+            for H in digraphs.tournaments_nauty(i):
+                if graphs_filter(H):
+                    continue
+                if any(map(lambda x: H.subgraph_search(x) is not None, T)):
+                    continue
+                if is_homomorphic_method(G, H):
+                    T.append(H)
+                else:
+                    found_not_homomorphic = True
+                    break
+            if found_not_homomorphic:
+                i += 1
+            else:
+                break
+
+    check_homomorphism(is_homomorphic_one_cycle, lambda H: not has_exactly_one_cycle(H))
+    check_homomorphism(homomorphic_to_tournament, lambda H: has_exactly_one_cycle(H) or H.is_directed_acyclic())
+    return i
