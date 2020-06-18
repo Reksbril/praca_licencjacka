@@ -62,3 +62,23 @@ def test_rm_sources():
     expected = DiGraph()
     expected.add_cycle([0, 1, 2, 3, 4])
     assert result == expected
+
+
+def test_rm_sources_less_than_in_T():
+    T = tournament_with_one_cycle(6, [False, False, False])
+    G = DiGraph()
+    G.add_cycle([0, 1, 2, 3, 4])
+    result = rm_sinks_and_sources(G, T)
+    expected = DiGraph()
+    expected.add_cycle([0, 1, 2, 3, 4])
+    assert result == expected
+
+
+def test_rm_sources_tournament():
+    T = tournament_with_one_cycle(6, [False, False, False])
+    G = DiGraph()
+    G.add_cycle([0, 1, 2, 3, 4])
+    _, result = rm_sinks_and_sources(G, T, True)
+    expected = DiGraph()
+    expected.add_cycle([0, 1, 2])
+    assert expected == result
