@@ -146,20 +146,24 @@ def compressibility_number(G):
 
     def check_homomorphism(is_homomorphic_method, graphs_filter):
         nonlocal i
+        nonlocal T
         while True:
             found_not_homomorphic = False
+            T_next = []
             for H in digraphs.tournaments_nauty(i):
                 if graphs_filter(H):
                     continue
-                if any(map(lambda x: x.is_subgraph(H) is not None, T)):
+                # Sprawdzamy, czy H zawiera którykolwiek z grafów w T
+                if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
                     continue
                 if is_homomorphic_method(G, H):
-                    T.append(H)
+                    T_next.append(H)
                 else:
                     found_not_homomorphic = True
                     break
             if found_not_homomorphic:
                 i += 1
+                T = T + T_next
             else:
                 break
 
