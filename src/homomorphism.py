@@ -4,8 +4,6 @@ from sage.graphs.connectivity import connected_components_subgraphs, is_connecte
 
 from src.helpers import *
 
-from copy import deepcopy
-
 
 def is_homomorphic_to_C_three(G):
     '''Sprawdza, czy graf G jest homomorficzny z C_3. G nie musi być
@@ -120,14 +118,11 @@ def homomorphic_to_tournament(G, T):
             return True
         v = sorted_G[i]
         for w in A[v]:
-            #A_copy = deepcopy(A)
             A_prev = {}
             L = set(T.neighbors_out(w))
             for z in G.neighbors_out(v):
-                #A_copy[z] = A_copy[z] & L
                 A_prev[z] = A[z]
                 A[z] = A[z] & L
-                #if len(A_copy[z]) == 0:
                 if len(A[z]) == 0:
                     for z in A_prev.keys():
                         A[z] = A_prev[z]
