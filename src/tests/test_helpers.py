@@ -20,13 +20,13 @@ def test_iterator_has_exactly_one_element_false(case):
     (False, DiGraph([(0, 1), (1, 2), (2, 0), (1, 3), (3, 2)])) # więcej cykli
 ])
 def test_has_one_cycle(case):
-    assert case[0] == has_exactly_one_cycle(case[1])
+    assert case[0] == has_exactly_one_cycle_tournament(case[1])
 
 
 def test_get_tournament_with_one_cycle():
     T = tournament_with_one_cycle(5, [True, False])
     assert T.is_tournament()
-    assert has_exactly_one_cycle(T)
+    assert has_exactly_one_cycle_tournament(T)
 
 def test_tournament_with_one_cycle_last_source():
     T = tournament_with_one_cycle(5, [True, False])
@@ -81,4 +81,11 @@ def test_rm_sources_tournament():
     _, result = rm_sinks_and_sources(G, T, True)
     expected = DiGraph()
     expected.add_cycle([0, 1, 2])
-    assert expected == result
+    assert result == expected
+
+
+def test_transitive():
+    result = transitive_tournament(5)
+    expected = DiGraph([(1, 0), (2, 0), (2, 1), (3, 0), (3, 1), (3, 2),
+                        (4, 0), (4, 1), (4, 2), (4, 3)])
+    assert result == expected

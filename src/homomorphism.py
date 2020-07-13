@@ -1,6 +1,5 @@
 import sage.all
 from sage.graphs.digraph import DiGraph
-from sage.graphs.digraph_generators import digraphs
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
 from src.helpers import *
@@ -57,7 +56,7 @@ def is_homomorphic_one_cycle(G, T):
     '''
     if not G.is_directed_acyclic():
         raise ValueError("G musi być skierowany i acykliczny.")
-    if not has_exactly_one_cycle(T) or not T.is_tournament():
+    if not has_exactly_one_cycle_tournament(T) or not T.is_tournament():
         raise ValueError("T musi być turniejem i zawierać dokładnie "
                          "jeden cykl skierowany.")
 
@@ -143,7 +142,7 @@ def compressibility_number(G):
     '''
     T = []
     i = homomorphic_to_transitive(G)
-    T.append(digraphs.TransitiveTournament(i))
+    T.append(transitive_tournament(i))
 
     def check_homomorphism(is_homomorphic_method, graphs_filter):
         nonlocal i
@@ -152,7 +151,7 @@ def compressibility_number(G):
             for H in digraphs.tournaments_nauty(i):
                 if graphs_filter(H):
                     continue
-                if any(map(lambda x: H.subgraph_search(x) is not None, T)):
+                if any(map(lambda x: x.is_subgraph(H) is not None, T)):
                     continue
                 if is_homomorphic_method(G, H):
                     T.append(H)
@@ -164,6 +163,6 @@ def compressibility_number(G):
             else:
                 break
 
-    check_homomorphism(is_homomorphic_one_cycle, lambda H: not has_exactly_one_cycle(H))
-    check_homomorphism(homomorphic_to_tournament, lambda H: has_exactly_one_cycle(H) or H.is_directed_acyclic())
+    check_homomorphism(is_homomorphic_one_cycle, lambda H: not has_exactly_one_cycle_tournament(H))
+    check_homomorphism(homomorphic_to_tournament, lambda H: has_exactly_one_cycle_tournament(H) or H.is_directed_acyclic())
     return i

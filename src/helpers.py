@@ -1,5 +1,6 @@
 import sage.all
 from sage.graphs.digraph import DiGraph
+from sage.graphs.digraph_generators import digraphs
 
 from src.DiGraphExtended import DiGraphExtended
 
@@ -22,15 +23,21 @@ def iterator_has_exactly_one_element(it):
     return False
 
 
-def has_exactly_one_cycle(G):
-    '''Zwraca True wtw G jest grafem skierowanym o dokładnie
+def has_exactly_one_cycle_tournament(G):
+    '''Zwraca True wtw G jest turniejem skierowanym o dokładnie
     jednym cyklu skierowanym.
     '''
     if not G.is_directed():
         raise ValueError("G musi być grafem skierowanym")
-    it = G.all_cycles_iterator(simple=True)
-    return iterator_has_exactly_one_element(it)
-
+    G_ex = DiGraphExtended(G, keep_removed=True)
+    while True:
+        if len(G_ex.sinks()) > 0:
+            G_ex.step("sink")
+        elif len(G_ex.sources()) > 0:
+            G_ex.step("source")
+        else:
+            break
+    return len(G_ex.get_current().vertices()) == 3
 
 def tournament_with_one_cycle(k, sink):
     '''Zwraca turniej z dokładnie jednym cyklem. Warto zauważyć
@@ -104,21 +111,12 @@ def rm_sinks_and_sources(G, T, keep_T = False):
         except RuntimeError:
             pass
 
+def transitive_tournament(n):
+    '''Zwraca turniej tranzytywny, którego krawędzie są sierowane od
+    wierzchołka o większym indeksie, do tego o większym.
 
-#TODO usunąć
-def example_function():
-    '''Opis
-
-    Parameters
-    ----------
-    param1 : typ
-        opis
-    param2 : typ
-        opis
-
-    Returns
-    -------
-    return : typ
-        opis
+    :param n: Rozmiar turnieju
+    :return: Turniej tranzytywny
     '''
-    pass
+    edges = [(j, i) for j in range(0, n) for i in range(0, j)]
+    return DiGraph(edges)
