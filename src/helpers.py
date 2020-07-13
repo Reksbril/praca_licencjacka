@@ -40,7 +40,7 @@ def has_exactly_one_cycle_tournament(G):
             G_ex.step("source")
         else:
             break
-    return len(G_ex.get_current().vertices()) == 3
+    return G_ex.current_vertex_count() == 3
 
 def tournament_with_one_cycle(k, sink):
     '''Zwraca turniej z dokładnie jednym cyklem. Warto zauważyć
