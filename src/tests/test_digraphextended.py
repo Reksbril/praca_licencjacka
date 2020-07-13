@@ -69,3 +69,13 @@ def test_vertex_count():
     result = ex.current_vertex_count()
     expected = 2
     assert result == expected
+
+def test_neighbors_out():
+    G = DiGraph(
+        [(0, 1), (1, 2), (1, 3), (1, 4), (4, 3)],
+        format='list_of_edges')
+    ex = DiGraphExtended(G, keep_removed=True)
+    ex.step('sink')
+    result = ex.neighbors_out(1)
+    expected = [4]
+    assert result == expected

@@ -5,6 +5,8 @@ from copy import copy
 class DiGraphExtended():
     '''Klasa odpowiedzialna za pamiętanie, które z wierzchołków
     kopii danego grafu skierowanego są ujściami, a które źródłami.
+    Ponadto, pozwala na szybkie usuwanie źródeł i ujść z grafu, oraz
+    działanie na kopii z usuniętymi wierzchołkami
 
     :param keep_removed: bool
         Kontroluje, czy pamiętać wierzchołki, które zostały usunięte.
@@ -102,3 +104,8 @@ class DiGraphExtended():
                              "zapamiętane usunięte wierzchołki.")
 
         return len(self.G.vertices()) - len(self.removed)
+
+    def neighbors_out(self, v):
+        '''Zwraca wierzchołki, do których prowadzą krawędzi wychodzące z v.
+        '''
+        return list(set(self.G.neighbors_out(v)) - set(self.removed))
