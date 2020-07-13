@@ -90,6 +90,5 @@ class DiGraphExtended():
             raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
                              "zapamiętane usunięte wierzchołki.")
 
-        G = copy(self.G)
-        G.delete_vertices(self.removed)
-        return G
+        kept = list(set(self.G.vertices()) - set(self.removed))
+        return self.G.subgraph(vertices=kept, inplace=False)
