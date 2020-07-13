@@ -29,6 +29,9 @@ def has_exactly_one_cycle_tournament(G):
     '''
     if not G.is_directed():
         raise ValueError("G musi być grafem skierowanym")
+    for edge in [(0, 1), (1, 2), (2, 0)]:
+        if not G.has_edge(edge):
+            return False
     G_ex = DiGraphExtended(G, keep_removed=True)
     while True:
         if len(G_ex.sinks()) > 0:
