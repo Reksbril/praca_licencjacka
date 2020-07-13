@@ -58,7 +58,7 @@ def is_homomorphic_one_cycle(G, T):
         raise ValueError("T musi być turniejem i zawierać dokładnie "
                          "jeden cykl skierowany.")
 
-    G = rm_sinks_and_sources(G, T)
+    G = rm_sinks_and_sources(G, T).get_current()
     #to co zostało, to pewien graf G, oraz T będący cyklem C_3
     return is_homomorphic_to_C_three(G)
 
@@ -108,8 +108,8 @@ def homomorphic_to_tournament(G, T):
     :return: True wtw G jest homomorficzny z T
     '''
     G, T = rm_sinks_and_sources(G, T, True)
-    if len(T.vertices()) == 0:
-        return len(G.vertices()) == 0
+    if T.current_vertex_count() == 0:
+        return G.current_vertex_count() == 0
     sorted_G = G.topological_sort()
 
     def assign(i, A):

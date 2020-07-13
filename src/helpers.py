@@ -29,7 +29,7 @@ def has_exactly_one_cycle_tournament(G):
     '''
     if not G.is_directed():
         raise ValueError("G musi być grafem skierowanym")
-    for edge in [(0, 1), (1, 2), (2, 0)]:
+    for edge in [(1, 0), (2, 1), (0, 2)]:
         if not G.has_edge(edge):
             return False
     G_ex = DiGraphExtended(G, keep_removed=True)
@@ -65,7 +65,7 @@ def tournament_with_one_cycle(k, sink):
         raise ValueError("Długość tablicy sink musi być równa k-3")
 
     T = DiGraph()
-    T.add_cycle([0, 1, 2])
+    T.add_cycle([0, 2, 1])
 
     def add_source(G, v):
         vertices = G.vertices()
@@ -87,8 +87,8 @@ def tournament_with_one_cycle(k, sink):
 
 
 def rm_sinks_and_sources(G, T, keep_T = False):
-    '''Zwraca kopię grafu G, która ma usunięte wszystkie źródła
-    i ujścia, zgodnie z uwagą pod Algorytmem 2 w [1].
+    '''Zwraca kopię grafu G jako DiGraphExtended, która ma
+    usunięte wszystkie źródła i ujścia, zgodnie z uwagą pod Algorytmem 2 w [1].
 
     :param keep_T: Jeżeli jest True, to funkcja zwraca również
     graf T, który został pozbawiony źródeł i ujść.
@@ -104,9 +104,9 @@ def rm_sinks_and_sources(G, T, keep_T = False):
             next_step = 'sink'
         else:
             if keep_T:
-                return exG.get_current(), exT.get_current()
+                return exG, exT
             else:
-                return exG.get_current()
+                return exG
 
         exT.step(next_step)
         try:

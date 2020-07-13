@@ -69,7 +69,7 @@ def test_not_homomorphic_to_C_three_simple():
 
 def test_homomorphic_to_T_one_cycle_simple():
     T = DiGraph([
-        (0, 1), (1, 2), (2, 0),
+        (1, 0), (2, 1), (0, 2),
         (0, 3), (1, 3), (2, 3),
         (4, 0), (4, 1), (4, 2), (4, 3)
     ], format='list_of_edges')

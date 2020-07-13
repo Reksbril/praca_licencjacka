@@ -16,7 +16,7 @@ def test_iterator_has_exactly_one_element_false(case):
 
 @pytest.mark.parametrize("case", [
     (False, DiGraph([(0, 1), (1, 2), (0, 2), (1, 3), (2, 3)])), # brak cykli
-    (True, DiGraph([(0, 1), (1, 2), (2, 0), (1, 3)])), # dokładnie jeden cykl
+    (True, DiGraph([(1, 0), (2, 1), (0, 2), (1, 3)])), # dokładnie jeden cykl
     (False, DiGraph([(0, 1), (1, 2), (2, 0), (1, 3), (3, 2)])) # więcej cykli
 ])
 def test_has_one_cycle(case):
@@ -58,7 +58,7 @@ def test_rm_sources():
         (5, 0), (6, 5), (6, 4), (7, 6), (7, 3), (7, 2)
     ])
     G.add_cycle([0, 1, 2, 3, 4])
-    result = rm_sinks_and_sources(G, T)
+    result = rm_sinks_and_sources(G, T).get_current()
     expected = DiGraph()
     expected.add_cycle([0, 1, 2, 3, 4])
     assert result == expected
@@ -68,7 +68,7 @@ def test_rm_sources_less_than_in_T():
     T = tournament_with_one_cycle(6, [False, False, False])
     G = DiGraph()
     G.add_cycle([0, 1, 2, 3, 4])
-    result = rm_sinks_and_sources(G, T)
+    result = rm_sinks_and_sources(G, T).get_current()
     expected = DiGraph()
     expected.add_cycle([0, 1, 2, 3, 4])
     assert result == expected
@@ -79,8 +79,9 @@ def test_rm_sources_tournament():
     G = DiGraph()
     G.add_cycle([0, 1, 2, 3, 4])
     _, result = rm_sinks_and_sources(G, T, True)
+    result = result.get_current()
     expected = DiGraph()
-    expected.add_cycle([0, 1, 2])
+    expected.add_cycle([0, 2, 1])
     assert result == expected
 
 

@@ -19,7 +19,7 @@ class DiGraphExtended():
             'sink' : G.out_degree(labels=True),
             'source' : G.in_degree(labels=True)
         }
-        self.vertices = {
+        self._vertices = {
             'sink' : G.sinks(),
             'source' : G.sources()
         }
@@ -44,20 +44,20 @@ class DiGraphExtended():
         if rm_type not in ['source', 'sink']:
             raise ValueError("rm_type musi być równy 'source' lub 'sink'.")
 
-        if len(self.vertices[rm_type]) == 0:
+        if len(self._vertices[rm_type]) == 0:
             raise RuntimeError("Brak wierzchołków do usunięcia")
 
         other = 'sink' if rm_type == 'source' else 'source'
         result = []
-        to_remove = self.vertices[rm_type]
-        for v in self.vertices[rm_type]:
+        to_remove = self._vertices[rm_type]
+        for v in self._vertices[rm_type]:
             for neigh in self._get_neighbors(rm_type, v):
                 self.degrees[rm_type][neigh] -= 1
                 if self.degrees[rm_type][neigh] == 0:
                     result.append(neigh)
 
         self._remove_duplicates(other, rm_type)
-        self.vertices[rm_type] = result
+        self._vertices[rm_type] = result
         if self.keep_removed:
             self.removed += to_remove
         return result
@@ -66,8 +66,8 @@ class DiGraphExtended():
         '''Usuwa wszystkie źródła jednocześnie będące ujściami (rm_type = 'source')
         lub odwrotnie (rm_type = 'sink'). other jest drugim z typów.
         '''
-        self.vertices[rm_type] = list(
-            set(self.vertices[rm_type]) - set(self.vertices[other]))
+        self._vertices[rm_type] = list(
+            set(self._vertices[rm_type]) - set(self._vertices[other]))
 
     def _get_neighbors(self, rm_type, v):
         '''W zależności od rm_type, zwraca wierzchołki wychodzące
@@ -79,10 +79,10 @@ class DiGraphExtended():
             return self.G.neighbors_out(v)
 
     def sources(self):
-        return self.vertices['source']
+        return self._vertices['source']
 
     def sinks(self):
-        return self.vertices['sink']
+        return self._vertices['sink']
 
     def get_current(self):
         '''Zwraca kopię obecnego grafu jako DiGraph. Możliwe tylko jeżeli
@@ -108,4 +108,23 @@ class DiGraphExtended():
     def neighbors_out(self, v):
         '''Zwraca wierzchołki, do których prowadzą krawędzi wychodzące z v.
         '''
+        if not self.keep_removed:
+            raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
+                             "zapamiętane usunięte wierzchołki.")
+
         return list(set(self.G.neighbors_out(v)) - set(self.removed))
+
+    def topological_sort(self):
+        '''Zwraca listę wierzchołków posortowaną topologicznie.
+        '''
+        if not self.keep_removed:
+            raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
+                             "zapamiętane usunięte wierzchołki.")
+
+        sorted_G = self.G.topological_sort()
+        for v in self.removed:
+            sorted_G.remove(v)
+        return sorted_G
+
+    def vertices(self):
+        return list(set(self.G.vertices()) - set(self.removed))
