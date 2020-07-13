@@ -120,14 +120,22 @@ def homomorphic_to_tournament(G, T):
             return True
         v = sorted_G[i]
         for w in A[v]:
-            A_copy = deepcopy(A)
+            #A_copy = deepcopy(A)
+            A_prev = {}
             L = set(T.neighbors_out(w))
             for z in G.neighbors_out(v):
-                A_copy[z] = A_copy[z] & L
-                if len(A_copy[z]) == 0:
+                #A_copy[z] = A_copy[z] & L
+                A_prev[z] = A[z]
+                A[z] = A[z] & L
+                #if len(A_copy[z]) == 0:
+                if len(A[z]) == 0:
+                    for z in A_prev.keys():
+                        A[z] = A_prev[z]
                     return False
-            if assign(i + 1, A_copy):
+            if assign(i + 1, A):
                 return True
+            for z in A_prev.keys():
+                A[z] = A_prev[z]
         return False
 
 
