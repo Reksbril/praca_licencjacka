@@ -59,3 +59,13 @@ def test_get_current():
     result = ex.get_current()
     expected = DiGraph([(0, 1)], format='list_of_edges')
     assert result == expected
+
+def test_vertex_count():
+    G = DiGraph(
+        [(0, 1), (1, 2), (1, 3), (1, 4)],
+        format='list_of_edges')
+    ex = DiGraphExtended(G, keep_removed=True)
+    ex.step('sink')
+    result = ex.current_vertex_count()
+    expected = 2
+    assert result == expected

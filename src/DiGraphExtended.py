@@ -92,3 +92,13 @@ class DiGraphExtended():
 
         kept = list(set(self.G.vertices()) - set(self.removed))
         return self.G.subgraph(vertices=kept, inplace=False)
+
+    def current_vertex_count(self):
+        '''Zwraca liczbę wierzchołków, które pozostały w grafie. Możliwe tylko
+        jeżeli keep_removed = True
+        '''
+        if not self.keep_removed:
+            raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
+                             "zapamiętane usunięte wierzchołki.")
+
+        return len(self.G.vertices()) - len(self.removed)
