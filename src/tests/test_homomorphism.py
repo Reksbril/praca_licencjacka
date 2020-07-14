@@ -10,14 +10,14 @@ from src.homomorphism import *
 def test_path_k_homomorphic_to_T_k(k):
     P = DiGraph()
     P.add_path(range(k))
-    assert is_homomorphic_to_transitive_k(P, k)
+    assert Homomorphism(P).is_homomorphic_to_transitive_k(k)
 
 
 @pytest.mark.parametrize("k", range(1, 10))
 def test_path_k_not_homomorphic_to_lesser_T_k(k):
     P = DiGraph()
     P.add_path(range(k))
-    assert not is_homomorphic_to_transitive_k(P, k - 1)
+    assert not Homomorphism(P).is_homomorphic_to_transitive_k(k - 1)
 
 
 @pytest.mark.parametrize("k", range(5, 10))
@@ -26,13 +26,13 @@ def test_T_l_homomorphic_to_T_k(k, l):
     result = (l <= 0)
     l = k + l
     T = digraphs.TransitiveTournament(l)
-    assert is_homomorphic_to_transitive_k(T, k) == result
+    assert Homomorphism(T).is_homomorphic_to_transitive_k(k) == result
 
 
 def test_homomorphic_to_transitive():
     P = DiGraph()
     P.add_path(range(10))
-    assert homomorphic_to_transitive(P) == 10
+    assert Homomorphism(P).homomorphic_to_transitive() == 10
 
 
 @pytest.mark.parametrize("T", [
@@ -43,7 +43,7 @@ def test_homomorphic_to_transitive():
 def test_one_cycle_wrong_T_argument(T):
     G = DiGraph(1)
     with pytest.raises(ValueError):
-        is_homomorphic_one_cycle(G, T)
+        Homomorphism(G).is_homomorphic_one_cycle(T)
 
 
 def test_homomorphic_to_C_three_simple():
@@ -51,20 +51,20 @@ def test_homomorphic_to_C_three_simple():
         (0, 1), (1, 2),
         (3, 4), (4, 5)
     ], format='list_of_edges')
-    assert is_homomorphic_to_C_three(G)
+    assert Homomorphism(G).is_homomorphic_to_C_three()
 
 
 def test_homomorphic_to_C_three_path():
     G = DiGraph()
     G.add_path(range(10))
-    assert is_homomorphic_to_C_three(G)
+    assert Homomorphism(G).is_homomorphic_to_C_three()
 
 
 def test_not_homomorphic_to_C_three_simple():
     G = DiGraph([
         (0, 1), (1, 2), (0, 2)
     ], format='list_of_edges')
-    assert not is_homomorphic_to_C_three(G)
+    assert not Homomorphism(G).is_homomorphic_to_C_three()
 
 
 def test_homomorphic_to_T_one_cycle_simple():
@@ -78,7 +78,7 @@ def test_homomorphic_to_T_one_cycle_simple():
     ], format='list_of_edges')
     G.add_path([6, 0, 1, 2, 3, 4, 5])
 
-    assert is_homomorphic_one_cycle(G, T)
+    assert Homomorphism(G).is_homomorphic_one_cycle(T)
 
 
 @pytest.mark.parametrize("case", [
@@ -89,7 +89,7 @@ def test_homomorphic_to_T_one_cycle_simple():
 def test_homomorphic_to_tournament_C_three(case):
     G = DiGraph(case[0], format='list_of_edges')
     T = DiGraph([(0, 1), (1, 2), (2, 0)], format='list_of_edges')
-    assert homomorphic_to_tournament(G, T) == case[1]
+    assert Homomorphism(G).homomorphic_to_tournament(T) == case[1]
 
 
 def test_tree_homomorphic_to_tournaments():
@@ -97,7 +97,7 @@ def test_tree_homomorphic_to_tournaments():
                  (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
                 format='list_of_edges')
     for T in digraphs.tournaments_nauty(5):
-        assert homomorphic_to_tournament(G, T)
+        assert Homomorphism(G).homomorphic_to_tournament(T)
 
 @pytest.mark.parametrize('k', [3, 4])
 def test_tree_not_homomorphic_to_transitive(k):
@@ -105,7 +105,7 @@ def test_tree_not_homomorphic_to_transitive(k):
                  (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
                 format='list_of_edges')
     T = digraphs.TransitiveTournament(k)
-    assert not homomorphic_to_tournament(G, T)
+    assert not Homomorphism(G).homomorphic_to_tournament(T)
 
 
 @pytest.mark.parametrize('edges', [
