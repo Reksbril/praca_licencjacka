@@ -26,6 +26,7 @@ class DiGraphExtended():
         self.keep_removed = keep_removed
         if keep_removed:
             self.removed = []
+        self._neighbors_out = {}
 
     def step(self, rm_type):
         '''Funkcja usuwająca, w zależności od parametry rm_type,
@@ -60,6 +61,7 @@ class DiGraphExtended():
         self._vertices[rm_type] = result
         if self.keep_removed:
             self.removed += to_remove
+        self._neighbors_out = {} # Po wykonaniu jakiejkolwiek modyfikacji, usuwa cache
         return result
 
     def _remove_duplicates(self, rm_type, other):
@@ -112,7 +114,9 @@ class DiGraphExtended():
             raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
                              "zapamiętane usunięte wierzchołki.")
 
-        return list(set(self.G.neighbors_out(v)) - set(self.removed))
+        if v not in self._neighbors_out:
+            self._neighbors_out[v] = list(set(self.G.neighbors_out(v)) - set(self.removed))
+        return self._neighbors_out[v]
 
     def topological_sort(self):
         '''Zwraca listę wierzchołków posortowaną topologicznie.
