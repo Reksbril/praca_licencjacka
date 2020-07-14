@@ -86,15 +86,25 @@ def tournament_with_one_cycle(k, sink):
     return T
 
 
-def rm_sinks_and_sources(G, T, keep_T = False):
+def rm_sinks_and_sources(G, T, keep_T = False, G_degrees = None, G_vertices = None):
     '''Zwraca kopię grafu G jako DiGraphExtended, która ma
     usunięte wszystkie źródła i ujścia, zgodnie z uwagą pod Algorytmem 2 w [1].
 
     :param keep_T: Jeżeli jest True, to funkcja zwraca również
     graf T, który został pozbawiony źródeł i ujść.
+    :param G_degrees: dict
+        Słownik zawierający listy out_degree i in_degree dla G postaci:
+        {'sink': <lista out_degree dla G>, 'source': <lista in_degree dla G>}
+        Musi być zgodny ze stanem faktycznym. W przeciwnym przypadku funkcja
+        da niepoprawny wynik!
+    :param G_vertices: dict
+        Słownik zawierający listy ujść i źródeł G postaci:
+        {'sink': <lista ujść>, 'source': <lista źródeł>}.
+        Musi być zgodny ze stanem faktycznym. W przeciwnym przypadku funkcja
+        da niepoprawny wynik!
     '''
 
-    exG = DiGraphExtended(G, keep_removed=True)
+    exG = DiGraphExtended(G, keep_removed=True, degrees=G_degrees, vertices=G_vertices)
     exT = DiGraphExtended(T, keep_removed=keep_T)
 
     while True:

@@ -11,18 +11,34 @@ class DiGraphExtended():
     :param keep_removed: bool
         Kontroluje, czy pamiętać wierzchołki, które zostały usunięte.
         Potrzebna, jeżeli chcemy odtworzyć graf z usniętymi wierzchołkami.
+    :param degrees: dict
+        Słownik zawierający listy out_degree i in_degree dla G postaci:
+        {'sink': <lista out_degree dla G>, 'source': <lista in_degree dla G>}
+        Musi być zgodny ze stanem faktycznym. W przeciwnym przypadku metody
+        klasy dadzą niepoprawne wyniki!
+    :param vertices: dict
+        Słownik zawierający listy ujść i źródeł G postaci:
+        {'sink': <lista ujść>, 'source': <lista źródeł>}.
+        Musi być zgodny ze stanem faktycznym. W przeciwnym przypadku metody
+        klasy dadzą niepoprawne wyniki!
     '''
 
-    def __init__(self, G, keep_removed = False):
+    def __init__(self, G, keep_removed = False, degrees = None, vertices = None):
         self.G = G
-        self.degrees = {
-            'sink' : G.out_degree(labels=True),
-            'source' : G.in_degree(labels=True)
-        }
-        self._vertices = {
-            'sink' : G.sinks(),
-            'source' : G.sources()
-        }
+        if degrees is None:
+            self.degrees = {
+                'sink' : G.out_degree(labels=True),
+                'source' : G.in_degree(labels=True)
+            }
+        else:
+            self.degrees = degrees
+        if vertices is None:
+            self._vertices = {
+                'sink' : G.sinks(),
+                'source' : G.sources()
+            }
+        else:
+            self._vertices = vertices
         self.keep_removed = keep_removed
         if keep_removed:
             self.removed = []

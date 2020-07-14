@@ -86,7 +86,7 @@ class Homomorphism():
             raise ValueError("T musi być turniejem i zawierać dokładnie "
                              "jeden cykl skierowany.")
 
-        G = rm_sinks_and_sources(self.G, T).get_current()
+        G = rm_sinks_and_sources(self.G, T, G_vertices=self._vertices, G_degrees=self.degrees).get_current()
         #to co zostało, to pewien graf G, oraz T będący cyklem C_3
         return self.is_homomorphic_to_C_three(G)
 
@@ -135,7 +135,7 @@ class Homomorphism():
         :param T: Dowolny turniej
         :return: True wtw G jest homomorficzny z T
         '''
-        G, T = rm_sinks_and_sources(self.G, T, True)
+        G, T = rm_sinks_and_sources(self.G, T, True, G_vertices=self._vertices, G_degrees=self.degrees)
         if T.current_vertex_count() == 0:
             return G.current_vertex_count() == 0
         sorted_G = G.topological_sort()
