@@ -79,3 +79,13 @@ def test_neighbors_out():
     result = ex.neighbors_out(1)
     expected = [4]
     assert result == expected
+
+def test_neighbors_in():
+    G = DiGraph(
+        [(0, 1), (1, 2), (1, 3), (1, 4), (4, 3)],
+        format='list_of_edges')
+    ex = DiGraphExtended(G, keep_removed=True)
+    ex.step('sink')
+    result = ex.neighbors_in(1)
+    expected = [0]
+    assert result == expected

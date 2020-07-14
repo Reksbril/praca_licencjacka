@@ -27,6 +27,9 @@ class DiGraphExtended():
         if keep_removed:
             self.removed = []
         self._neighbors_out = {}
+        self._neighbors_in = {}
+        self.G_neighbors_in = {}
+        self.G_neighbors_out = {}
 
     def step(self, rm_type):
         '''Funkcja usuwająca, w zależności od parametry rm_type,
@@ -62,6 +65,7 @@ class DiGraphExtended():
         if self.keep_removed:
             self.removed += to_remove
         self._neighbors_out = {} # Po wykonaniu jakiejkolwiek modyfikacji, usuwa cache
+        self._neighbors_in = {}
         return result
 
     def _remove_duplicates(self, rm_type, other):
@@ -76,9 +80,13 @@ class DiGraphExtended():
         lub wchodzące do wierzchołka v.
         '''
         if rm_type == 'sink':
-            return self.G.neighbors_in(v)
+            if v not in self.G_neighbors_in:
+                self.G_neighbors_in[v] = self.G.neighbors_in(v)
+            return self.G_neighbors_in[v]
         else:
-            return self.G.neighbors_out(v)
+            if v not in self.G_neighbors_out:
+                self.G_neighbors_out[v] = self.G.neighbors_out(v)
+            return self.G_neighbors_out[v]
 
     def sources(self):
         return self._vertices['source']
@@ -108,7 +116,7 @@ class DiGraphExtended():
         return len(self.G.vertices()) - len(self.removed)
 
     def neighbors_out(self, v):
-        '''Zwraca wierzchołki, do których prowadzą krawędzi wychodzące z v.
+        '''Zwraca wierzchołki, do których prowadzą krawędzie wychodzące z v.
         '''
         if not self.keep_removed:
             raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
@@ -117,6 +125,17 @@ class DiGraphExtended():
         if v not in self._neighbors_out:
             self._neighbors_out[v] = list(set(self.G.neighbors_out(v)) - set(self.removed))
         return self._neighbors_out[v]
+
+    def neighbors_in(self, v):
+        '''Zwraca wierzchołki, z których prowadzą krawędzie wychodzące z v.
+        '''
+        if not self.keep_removed:
+            raise ValueError("Nie można odtworzyć grafu jeżeli nie zostały "
+                             "zapamiętane usunięte wierzchołki.")
+
+        if v not in self._neighbors_in:
+            self._neighbors_in[v] = list(set(self.G.neighbors_in(v)) - set(self.removed))
+        return self._neighbors_in[v]
 
     def topological_sort(self):
         '''Zwraca listę wierzchołków posortowaną topologicznie.
