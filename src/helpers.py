@@ -2,7 +2,7 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 from sage.graphs.digraph_generators import digraphs
 
-from src.DiGraphExtended import DiGraphExtended
+from DiGraphExtended import DiGraphExtended
 
 '''
 Plik zawierający funkcje pomocnicze
@@ -105,7 +105,12 @@ def rm_sinks_and_sources(G, T, keep_T = False, G_degrees = None, G_vertices = No
     '''
 
     exG = DiGraphExtended(G, keep_removed=True, degrees=G_degrees, vertices=G_vertices)
-    exT = DiGraphExtended(T, keep_removed=keep_T)
+
+    T_vertices = {'sink': T.sinks(), 'source': T.sources()}
+    if len(T_vertices['sink']) == 0 and len(T_vertices['source']) == 0: # tablica degrees jest wtedy bezużyteczna
+        exT = DiGraphExtended(T, keep_removed=keep_T, vertices=T_vertices, degrees={})
+    else:
+        exT = DiGraphExtended(T, keep_removed=keep_T, vertices=T_vertices)
 
     while True:
         if len(exT.sources()) > 0:

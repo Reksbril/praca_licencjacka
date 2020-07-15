@@ -2,7 +2,7 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
-from src.helpers import *
+from helpers import *
 
 class Homomorphism():
     '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju homomorfizmy.
