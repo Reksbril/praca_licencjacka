@@ -3,7 +3,7 @@ from sage.graphs.digraph import DiGraph
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
 from src.helpers import *
-from src.parallel import run_in_parallel
+from src.parallel import Parallel
 
 class Homomorphism():
     '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju homomorfizmy.
@@ -166,21 +166,6 @@ class Homomorphism():
         A = {v: set(T.vertices()) for v in G.vertices()}
         return assign(0, A)
 
-from tqdm import tqdm
-
-def get_n_from_iter(iterator, n):
-    tab = []
-    j = 0
-    for item in iterator:
-        tab.append(item)
-        j += 1
-        if j == n:
-            yield tab
-            tab = []
-            j = 0
-    if j > 0:
-        yield tab
-
 
 def compressibility_number(G):
     '''Fukcja implementująca główny algrytm.
@@ -193,23 +178,23 @@ def compressibility_number(G):
     i = homomorphism_helper.homomorphic_to_transitive()
     T.append(transitive_tournament(i))
 
-    def check_homomorphism(is_homomorphic_method, graphs_generator):
+    def check_homomorphism(is_homomorphic_method, graphs_generator, parallel = False):
         nonlocal i
         nonlocal T
         while True:
             found_not_homomorphic = False
             T_next = []
-            if i == 10: # parallel
-                n_threads = 8
-                chunk_size = 80000
-                for H_tab in tqdm(get_n_from_iter(graphs_generator(i), chunk_size), total=120):
-                    if not run_in_parallel(T, H_tab, int(chunk_size / n_threads), is_homomorphic_method):
-                        break
+            if parallel and i == 10:
+                if not Parallel(n_threads=8, n_graphs_in_thread=10000, is_homomorphic_method=is_homomorphic_method, T=T).run():
+                    found_not_homomorphic = True
             else:
                 for H in graphs_generator(i):
                     if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
                         continue
-                    if not is_homomorphic_method(H):
+                    if is_homomorphic_method(H):
+                        if i < 10:
+                            T_next.append(H)
+                    else:
                         found_not_homomorphic = True
                         break
             if found_not_homomorphic:
@@ -219,5 +204,5 @@ def compressibility_number(G):
                 break
 
     check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle, lambda x: tournament_iterator(x, 'one_cycle'))
-    check_homomorphism(homomorphism_helper.homomorphic_to_tournament, lambda x: tournament_iterator(x, 'more_cycles'))
+    check_homomorphism(homomorphism_helper.homomorphic_to_tournament, lambda x: tournament_iterator(x, 'more_cycles'), True)
     return i
