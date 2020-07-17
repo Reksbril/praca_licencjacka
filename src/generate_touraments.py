@@ -11,8 +11,8 @@ from src.helpers import *
 
 
 if __name__ == '__main__':
-    graphs_counts = [2, 4, 12, 56, 456, 6880, 191536, 9733056]
-    for i in range(3, 11):
+    graphs_counts = [1, 1, 2, 4, 12, 56, 456, 6880, 191536, 9733056]
+    for i in range(1, 11):
         one = []
         more = []
         transitive = False  # czy już napotkany był turniej tranzytywny

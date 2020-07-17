@@ -7,7 +7,6 @@ import pytest
 from src.homomorphism import compressibility_number
 
 
-#7 - 198 ms, 8 - 2.8s, 9 - 1m 30s
 @pytest.mark.parametrize('n', list(range(2, 9)))
 def test_path(n):
     G = digraphs.Path(n)

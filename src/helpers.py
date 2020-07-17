@@ -5,11 +5,13 @@ from sage.graphs.digraph_generators import digraphs
 from src.DiGraphExtended import DiGraphExtended
 
 from copy import deepcopy
+import os
 
 '''
 Plik zawierający funkcje pomocnicze
 '''
 
+PATH = os.path.dirname(os.path.abspath(__file__))
 
 def iterator_has_exactly_one_element(it):
     '''Zwraca True wtw iterator it ma dokładnie jeden element.
@@ -35,7 +37,7 @@ def tournament_iterator(i, cycles):
     :return: DiGraph
         Kolejne grafy skierowane.
     '''
-    file = open("../../tournaments/" + cycles + "/%d.dig6" % i, 'r')
+    file = open(PATH + "/../tournaments/" + cycles + "/%d.dig6" % i, 'r')
     lines = file.readlines()
     for line in lines:
         yield DiGraph(line, format="dig6")

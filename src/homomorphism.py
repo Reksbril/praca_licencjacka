@@ -177,20 +177,19 @@ def compressibility_number(G):
     i = homomorphism_helper.homomorphic_to_transitive()
     T.append(transitive_tournament(i))
 
-    def check_homomorphism(is_homomorphic_method, graphs_filter):
+    def check_homomorphism(is_homomorphic_method, graphs_generator):
         nonlocal i
         nonlocal T
         while True:
             found_not_homomorphic = False
             T_next = []
-            for H in digraphs.tournaments_nauty(i):
-                if graphs_filter(H):
-                    continue
+            for H in graphs_generator(i):
                 # Sprawdzamy, czy H zawiera którykolwiek z grafów w T
                 if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
                     continue
                 if is_homomorphic_method(H):
-                    T_next.append(H)
+                    if i < 10: # dla i == 10 nie potrzebujemy zapisywać, bo wyżej już nie sprawdzamy
+                        T_next.append(H)
                 else:
                     found_not_homomorphic = True
                     break
@@ -200,7 +199,6 @@ def compressibility_number(G):
             else:
                 break
 
-    check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle, lambda H: not has_exactly_one_cycle_tournament(H))
-    check_homomorphism(homomorphism_helper.homomorphic_to_tournament,
-                       lambda H: has_exactly_one_cycle_tournament(H) or H.is_directed_acyclic())
+    check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle, lambda x: tournament_iterator(x, 'one_cycle'))
+    check_homomorphism(homomorphism_helper.homomorphic_to_tournament, lambda x: tournament_iterator(x, 'more_cycles'))
     return i

@@ -14,7 +14,7 @@ from src.helpers import *
 def test_iterator_has_exactly_one_element_false(case):
     assert case[0] == iterator_has_exactly_one_element(case[1])
 
-@pytest.mark.parametrize("i", list(range(3, 10)))
+@pytest.mark.parametrize("i", list(range(3, 9)))
 def test_tournament_iterator(i):
     transitive = False # czy był już napotkany turniej tranzytywny
     one_cycle = False # czy był już napotkany turniej o jednym cyklu
