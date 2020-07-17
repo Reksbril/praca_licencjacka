@@ -71,6 +71,7 @@ class DiGraphExtended():
         result = []
         to_remove = self._vertices[rm_type]
         for v in self._vertices[rm_type]:
+            self.degrees[other][v] = 0
             for neigh in self._get_neighbors(rm_type, v):
                 self.degrees[rm_type][neigh] -= 1
                 if self.degrees[rm_type][neigh] == 0:

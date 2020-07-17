@@ -2,6 +2,7 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 
 import pytest
+from collections import Counter
 
 from src.helpers import *
 
@@ -114,6 +115,15 @@ def test_rm_sinks_sources_keep_dicts():
     assert degrees['source'] == G.in_degree(labels=True)
     assert vertices['sink'] == G.sinks()
     assert vertices['source'] == G.sources()
+
+def test_rm_sinks_and_sources_double_remove():
+    G = DiGraph([(0, 1), (0, 6), (1, 2), (2, 3), (3, 4), (4, 5), (7, 5), (7, 6)])
+    T = DiGraph([(1, 0), (2, 0), (2, 1), (2, 4), (3, 0), (3, 1), (3, 2), (4, 0),
+                  (4, 1), (4, 3), (5, 0), (5, 1), (5, 2), (5, 3), (5, 4)])
+    ex_G = rm_sinks_and_sources(G, T)
+    counter = Counter(ex_G.removed)
+    for v in [0, 5, 6, 7]:
+        assert counter[v] == 1
 
 
 def test_transitive():
