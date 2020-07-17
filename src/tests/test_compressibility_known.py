@@ -13,10 +13,10 @@ def test_path(n):
     G = digraphs.Path(n)
     assert compressibility_number(G) == n
 
-@pytest.mark.parametrize('n', list(range(1, 9)))
+@pytest.mark.parametrize('n', list(range(1, 8)))
 def test_cycle(n):
     G = digraphs.Path(5)
     G.add_path(list(range(5, n + 5)))
     G.add_edges([(0, 5), (4, n + 4)])
     print(G.edges())
-    assert compressibility_number(G) == 6
+    assert compressibility_number(G) == max(6, n + 1)
