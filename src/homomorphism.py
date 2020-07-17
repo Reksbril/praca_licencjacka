@@ -3,6 +3,7 @@ from sage.graphs.digraph import DiGraph
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
 from src.helpers import *
+from src.parallel import run_in_parallel
 
 class Homomorphism():
     '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju homomorfizmy.
@@ -166,7 +167,6 @@ class Homomorphism():
         return assign(0, A)
 
 from tqdm import tqdm
-from multiprocessing import Process
 
 def get_n_from_iter(iterator, n):
     tab = []
@@ -181,36 +181,6 @@ def get_n_from_iter(iterator, n):
     if j > 0:
         yield tab
 
-class Result:
-    def __init__(self):
-        self.result = False
-
-def homomorphic_H(T, tab, res, is_homomorphic_method):
-    for H in tab:
-        if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
-            continue
-        if not is_homomorphic_method(H):
-            res.result = False
-            return
-    res.result = True
-
-def run_in_parallel(T, H_tab, n, is_homomorphic_method):
-    P = []
-    results = []
-    for i in range(0, len(H_tab), n):
-        fragment = H_tab[i:i + n]
-        res = Result()
-        p = Process(target=homomorphic_H, args=(T, fragment, res, is_homomorphic_method,))
-        p.start()
-        P.append(p)
-        results.append(res)
-    for p in P:
-        p.join()
-
-    for j in range(len(results)):
-        if not results[j]:
-            return False
-    return True
 
 def compressibility_number(G):
     '''Fukcja implementująca główny algrytm.
@@ -229,10 +199,11 @@ def compressibility_number(G):
         while True:
             found_not_homomorphic = False
             T_next = []
-            if i == 10:
-                for H_tab in tqdm(get_n_from_iter(graphs_generator(i), 80000), total=120):
-                    found_not_homomorphic = not run_in_parallel(T, H_tab, 10000, is_homomorphic_method)
-                    if found_not_homomorphic:
+            if i == 10: # parallel
+                n_threads = 8
+                chunk_size = 80000
+                for H_tab in tqdm(get_n_from_iter(graphs_generator(i), chunk_size), total=120):
+                    if not run_in_parallel(T, H_tab, int(chunk_size / n_threads), is_homomorphic_method):
                         break
             else:
                 for H in graphs_generator(i):
