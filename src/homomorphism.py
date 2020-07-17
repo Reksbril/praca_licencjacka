@@ -2,7 +2,7 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 from sage.graphs.connectivity import connected_components_subgraphs, is_connected
 
-from helpers import *
+from src.helpers import *
 
 class Homomorphism():
     '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju homomorfizmy.
@@ -193,6 +193,7 @@ def compressibility_number(G):
                     T_next.append(H)
                 else:
                     found_not_homomorphic = True
+                    print(H.edges())
                     break
             if found_not_homomorphic:
                 i += 1

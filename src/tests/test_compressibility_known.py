@@ -1,13 +1,22 @@
 import sage.all
 from sage.graphs.digraph_generators import digraphs
+from sage.graphs.digraph import DiGraph
 
 import pytest
 
 from src.homomorphism import compressibility_number
 
 
-#7 - 552 ms, 8 - 3s, 9 - 2m 56s
-#@pytest.mark.parametrize('n', list(range(2, 9)))
-def test_path():
-    G = digraphs.Path(8)
-    assert compressibility_number(G) == 8
+#7 - 198 ms, 8 - 2.8s, 9 - 1m 30s
+@pytest.mark.parametrize('n', list(range(2, 9)))
+def test_path(n):
+    G = digraphs.Path(n)
+    assert compressibility_number(G) == n
+
+@pytest.mark.parametrize('n', list(range(1, 9)))
+def test_cycle(n):
+    G = digraphs.Path(5)
+    G.add_path(list(range(5, n + 5)))
+    G.add_edges([(0, 5), (4, n + 4)])
+    print(G.edges())
+    assert compressibility_number(G) == 6

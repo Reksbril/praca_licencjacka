@@ -84,6 +84,37 @@ def test_rm_sources_tournament():
     expected.add_cycle([0, 2, 1])
     assert result == expected
 
+def test_rm_sinks_sources_complex():
+    G = digraphs.Path(5)
+    G.add_path(list(range(5, 6)))
+    G.add_edges([(0, 5), (4, 5)])
+    T = DiGraph([(1, 0), (2, 0), (2, 1), (2, 4), (3, 0), (3, 1), (3, 2), (4, 0), (4, 1),
+                 (4, 3), (5, 0), (5, 1), (5, 2), (5, 3), (5, 4)])
+    G, T = rm_sinks_and_sources(G, T, keep_T=True)
+    assert set(G.removed) == set([0, 4, 5])
+    assert set(T.removed) == set([0, 1, 5])
+
+
+def test_rm_sinks_sources_keep_dicts():
+    G = digraphs.Path(5)
+    G.add_path(list(range(5, 6)))
+    G.add_edges([(0, 5), (4, 5)])
+    T = DiGraph([(1, 0), (2, 0), (2, 1), (2, 4), (3, 0), (3, 1), (3, 2), (4, 0), (4, 1),
+                 (4, 3), (5, 0), (5, 1), (5, 2), (5, 3), (5, 4)])
+    degrees = {
+        'sink' : G.out_degree(labels=True),
+        'source' : G.in_degree(labels=True)
+    }
+    vertices = {
+        'sink': G.sinks(),
+        'source': G.sources()
+    }
+    rm_sinks_and_sources(G, T, keep_T=True, G_degrees=degrees, G_vertices=vertices)
+    assert degrees['sink'] == G.out_degree(labels=True)
+    assert degrees['source'] == G.in_degree(labels=True)
+    assert vertices['sink'] == G.sinks()
+    assert vertices['source'] == G.sources()
+
 
 def test_transitive():
     result = transitive_tournament(5)
