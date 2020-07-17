@@ -193,7 +193,6 @@ def compressibility_number(G):
                     T_next.append(H)
                 else:
                     found_not_homomorphic = True
-                    print(H.edges())
                     break
             if found_not_homomorphic:
                 i += 1
