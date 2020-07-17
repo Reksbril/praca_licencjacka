@@ -24,6 +24,22 @@ def iterator_has_exactly_one_element(it):
         return True
     return False
 
+def tournament_iterator(i, cycles):
+    '''Iterator po grafach o jednym, lub co najmniej dwóch cyklach skierowanych
+    (w zależności od parametru cycles).
+
+    :param i: Int
+        Liczba wierzchołków grafu
+    :param cycles: string
+        'one_cycle' lub 'more_cycles'
+    :return: DiGraph
+        Kolejne grafy skierowane.
+    '''
+    file = open("../../tournaments/" + cycles + "/%d.dig6" % i, 'r')
+    lines = file.readlines()
+    for line in lines:
+        yield DiGraph(line, format="dig6")
+
 
 def has_exactly_one_cycle_tournament(G):
     '''Zwraca True wtw G jest turniejem skierowanym o dokładnie

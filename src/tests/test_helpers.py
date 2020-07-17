@@ -14,6 +14,21 @@ from src.helpers import *
 def test_iterator_has_exactly_one_element_false(case):
     assert case[0] == iterator_has_exactly_one_element(case[1])
 
+@pytest.mark.parametrize("i", list(range(3, 10)))
+def test_tournament_iterator(i):
+    transitive = False # czy był już napotkany turniej tranzytywny
+    one_cycle = False # czy był już napotkany turniej o jednym cyklu
+    my_iterator = tournament_iterator(i, "more_cycles")
+    for G in digraphs.tournaments_nauty(i):
+        if not transitive and G.is_transitive():
+            transitive = True
+            continue
+        if not one_cycle and has_exactly_one_cycle_tournament(G):
+            one_cycle = True
+            continue
+        H = next(my_iterator)
+        assert G == H
+
 
 @pytest.mark.parametrize("case", [
     (False, DiGraph([(0, 1), (1, 2), (0, 2), (1, 3), (2, 3)])), # brak cykli

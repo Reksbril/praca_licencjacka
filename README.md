@@ -1,5 +1,10 @@
 # Praca licencjacka
 
+## Układ
+Katalog *src/* zawiera wszystkie pliki źródłowe, wraz z testami, które znajdują się w *src/tests/*. Katalog 
+*tournaments/* zawiera wszystkie turnieje, które są używane w algorytmach. Można je wygenerować, uruchamiają skrypt
+*generate_tournaments.sh*
+
 Repozytorium implementacji algorytmu stanowiącego część pracy licencjackiej. 
 Wykorzystuje bibliotekę [SAGE](http://doc.sagemath.org/html/en/index.html).
 
