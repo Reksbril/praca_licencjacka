@@ -27,3 +27,8 @@ def test_cycle_bigger(n, m):
     G.add_path(list(range(n + 6, n + m + 6)))
     G.add_edges([(0, 6), (n + 6, 5), (n + m + 5, n + 5)])
     assert compressibility_number(G) == max(6, n + 1, m + 1)
+
+@pytest.mark.parametrize('n', list(range(11, 16)))
+def test_compressibility_big(n):
+    G = digraphs.Path(n)
+    assert compressibility_number(G) == -1
