@@ -157,7 +157,7 @@ class Homomorphism():
                             A[z] = A_prev[z]
                         assignment_possible = False
                         break
-                if assign(i + 1, A):
+                if assignment_possible and assign(i + 1, A):
                     return True
                 for z in A_prev.keys():
                     A[z] = A_prev[z]
