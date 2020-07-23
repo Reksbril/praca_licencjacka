@@ -79,6 +79,23 @@ def check_compressibility_many(graphs_generator, n_checks, save_results = None):
     return result
 
 def plot_graphs(file_in, dir_out, compressibility=None, path_len=None, compr_path_diff=None):
+    '''Funkcja rysująca grafy, które zostały zapisane w pliku 'file_in' i spełniające kryteria określone przez
+    ostatnie trzy parametry opisane poniżej.
+
+    :param file_in: string
+        Ścieżka do pliku, z którego pobierane są grafy.
+    :param dir_out: string
+        Ścieżka do katalogu, w którym zostaną zapisane rysunki.
+    :param compressibility: list
+        Lista określająca, jaką kompresowalność muszą mieć grafy, żeby zostały narysowane. Jeżeli równe 'None', to brak
+        ograniczeń.
+    :param path_len: list
+        Lista określająca, jaką długość najdłuższej ścieżki muszą mieć grafy, żeby zostały narysowane. Jeżeli równe
+        'None', to brak ograniczeń.
+    :param compr_path_diff: list
+        Lista określająca, jaką różnicę pomiędzy kompresowalnością, a długośćią najdłuższej ścieżki muszą mieć grafy,
+        żeby zostały narysowane. Jeżeli równe 'None', to brak ograniczeń.
+    '''
     file = open(file_in, 'r')
     i = 0
     if dir_out[-1] != '/':
@@ -99,7 +116,3 @@ def plot_graphs(file_in, dir_out, compressibility=None, path_len=None, compr_pat
         p = DiGraph(graph).plot(title="Longest path: %d, Compressibility: %d" % (path, comp))
         p.save(dir_out + "%d.png" % i)
         i += 1
-
-
-#print(check_compressibility_many(lambda : random_cycle_paths_out(5, 20), 100, "kek"))
-plot_graphs("kek", "kekk", compressibility=[4])
