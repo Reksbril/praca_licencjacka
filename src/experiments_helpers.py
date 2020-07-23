@@ -9,21 +9,33 @@ import numpy as np
 from time import time
 
 
-def random_cycle_paths_out(max_path_len, max_vertices):
-    '''Funkcja losująca grafy będące skierowaniami grafów nieskierowanych o dokładnie jedym cyklu, z którego wychodzą
-    rozłączne ścieżki.
+def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, min_cycle_len=1):
+    '''Funkcja losująca grafy nieskierowane o dokładnie jedym cyklu, z którego wychodzą rozłączne ścieżki.
 
+    :param min_cycle_len: Int
+        Minimalna dozwolona długość cyklu.
+    :param max_cycle_len: Int
+        Największa dozwolona długość cyklu. Jeżeli długość wylosowanego cyklu będzie równa `1`, to wygenerowany zostanie
+        wierzchołek, a jeżeli będzie równa `2`, to wygenerowana zostanie krawędź.
     :param max_path_len: Int
-        Największa dozwolona długość ścieżki skierowanej.
+        Największa dozwolona długość ścieżki wychodzącej z cyklu.
     :param max_vertices: Int
         Największa dozwolona liczba krawędzi.
     :return: tuple
         Para skłądająca się z opisanego grafu skierowanego, oraz długości jego najdłuższej ścieżki.
     '''
+    if min_cycle_len < 1:
+        raise ValueError("Minimalna długość cyklu nie może być mniejsza od 1.")
+    if min_cycle_len > max_cycle_len:
+        raise ValueError("Minimalna długość cyklu musi być mniejsza lub równa maksymalnej.")
     G = Graph()
-    # losowanie krawędzi
-    cycle_len = np.random.randint(3, max_path_len + 2) # [3, max_path_len + 2)
-    G.add_cycle(list(range(0, cycle_len)))
+    cycle_len = np.random.randint(1, max_cycle_len) # [3, max_path_len + 2)
+    if cycle_len == 1:
+        G.add_vertex(0)
+    elif cycle_len == 2:
+        G.add_edge((0, 1))
+    else:
+        G.add_cycle(list(range(0, cycle_len)))
     n = cycle_len
     got_max_vertices = n >= max_vertices
     for i in range(cycle_len):
@@ -39,8 +51,20 @@ def random_cycle_paths_out(max_path_len, max_vertices):
             n += path_length
             if got_max_vertices:
                 break
+    return G
 
-    # losowanie orientacji
+
+def random_orientation(G, max_path_len):
+    '''FUnkcja tworząca losowe acykliczne skierowanie grafu `G`, którego długość najdłuższej ścieżki skierowanej jest
+    mniejsza lub równa `max_path_len`.
+
+    :param G: Graph
+        Graf, którego skierowanie jest losowane.
+    :param max_path_len: Int
+        Największa długość ścieżki skierowanej w wyjściowym grafie.
+    :return:
+        Acykliczny graf skierowany.
+    '''
     good_orientation = False
     while not good_orientation: # przeważnie za 1 albo 2 razem
         DiG = G.random_orientation()
