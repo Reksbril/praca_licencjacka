@@ -49,25 +49,23 @@ def random_cycle_paths_out(max_path_len, max_vertices):
     return DiG, longest_path_len
 
 
-def check_compressibility_many(graphs_generator, n_checks, save_results = None):
-    '''Funkcja liczy kompresyjność dla 'n_checks' grafów, które są wygenerowane przez 'graphs_generator'.
+def check_compressibility_many(graphs, save_results = None):
+    '''Funkcja liczy kompresyjność dla grafów podanych na wejściu.
 
     :param graphs_generator:
-        Funkcja, za pomocą której wytwarzane są kolejne grafy.
-    :param n_checks: Int
-        Liczba grafów, które będą wygenerowane
+        Iterator, za pomocą którego wytwarzane są kolejne grafy. Powinien zwracać parę `(G, i)`, gdzie `G` jest grafem
+        skierowanym, a `i` jest długością najdłuższej ścieżki skierowanej w `G`.
     :param save_results: string
         Plik, do którego zapisane zostaną dane w postaci
-        "<graf w formacie dig6> <kompresyjność grafu> <długość najdłuższej ścieżki w grafie>"
-        linijka po linijce
+        "<graf w formacie dig6> <kompresyjność grafu> <długość najdłuższej ścieżki w grafie>" linijka po linijce
     :return: list
-        Lista o długośc 'n_checks' składająca się z tupli (kompresyjnośc grafu, długość najdłuższej ścieżki w grafie)
+        Lista o długości równej liczbie wygenerowanych grafów składająca się z tupli
+        (kompresyjnośc grafu, długość najdłuższej ścieżki w grafie)
     '''
     result = []
     if save_results is not None:
         graphs = []
-    for i in range(n_checks):
-        G, longest_path_len = graphs_generator()
+    for G, longest_path_len in graphs:
         if save_results is not None:
             graphs.append(G.dig6_string())
         compressibility = compressibility_number(G)
