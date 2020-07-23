@@ -148,13 +148,15 @@ class Homomorphism():
             for w in A[v]:
                 A_prev = {}
                 L = set(T.neighbors_out(w))
+                assignment_possible = True
                 for z in G.neighbors_out(v):
                     A_prev[z] = A[z]
                     A[z] = A[z] & L
                     if len(A[z]) == 0:
                         for z in A_prev.keys():
                             A[z] = A_prev[z]
-                        return False
+                        assignment_possible = False
+                        break
                 if assign(i + 1, A):
                     return True
                 for z in A_prev.keys():
