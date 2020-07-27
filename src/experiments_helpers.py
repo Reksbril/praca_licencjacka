@@ -30,7 +30,8 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_c
     :param max_vertices: Int
         Największa dozwolona liczba krawędzi.
     :return: tuple
-        Para składająca się z opisanego grafu skierowanego, oraz długości jego najdłuższej ścieżki.
+        Para składająca się z opisanego grafu skierowanego, oraz listy wierzchołków składającej się z wierzchołków cyklu
+        oraz ścieżek "zewnętrznych".
     '''
     if p < 0 or p > 1:
         raise ValueError("Niepoprawna wartość prawdopodobieństwa. `p` musi należeć do przedziału [0, 1]")
@@ -47,12 +48,14 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_c
     if cycle_len == 1:
         p = 1
         G.add_vertex(0)
+        outside_vertices = [0]
     elif cycle_len == 2:
         p = 1
         G.add_edge((0, 1))
+        outside_vertices = [0, 1]
     else:
-        print(list(range(0, cycle_len)))
         G.add_cycle(list(range(0, cycle_len)))
+        outside_vertices = list(range(0, cycle_len))
     n = cycle_len
     got_max_vertices = n >= max_vertices
     cycle_partitions = [list(range(0, n))]
@@ -96,10 +99,11 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_c
                 G.add_path([i] + new_path + [j])
             else:
                 G.add_path([i] + list(range(n, n + path_length)))
+                outside_vertices += list(range(n, n + path_length))
             n += path_length
             if got_max_vertices:
                 break
-    return G
+    return G, outside_vertices
 
 
 def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_path_len, min_cycle_len=1):
@@ -122,34 +126,43 @@ def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_
         Spójny graf nieskierowany
     '''
     G = Graph()
+    outside_vertices = []
     for i in range(n_cycles):
-        H = random_cycle_paths_out(max_cycle_len=max_cycle_len,
+        H, out = random_cycle_paths_out(max_cycle_len=max_cycle_len,
                                    min_cycle_len=min_cycle_len,
                                    max_path_len=int(max_path_len/2),
                                    max_vertices=int(max_vertices/n_cycles))
-        #G = G.disjoint_union(H)
-        G=H
-    #G.relabel()
-    connected_components = G.connected_components()
-    while len(connected_components) > 1:
-        i, j = np.random.choice(range(len(connected_components)), size=2, replace=False)
-        v, = np.random.choice(connected_components[i], size=1)
-        u, = np.random.choice(connected_components[j], size=1)
+        outside_vertices.append([(i, v) for v in out])
+        H.relabel(lambda v: (i, v))
+        G = G.union(H)
+    while len(outside_vertices) > 1:
+        i, j = np.random.choice(range(len(outside_vertices)), size=2, replace=False)
+        out_i = outside_vertices[i]
+        out_j = outside_vertices[j]
+        v_id, = np.random.choice(len(out_i), size=1)
+        v = out_i[v_id]
+        u_id, = np.random.choice(len(out_j), size=1)
+        u = out_j[u_id]
         G.merge_vertices([u, v])
-        connected_components = G.connected_components()
+        out_new = out_i + out_j
+        out_new.remove(v) # v merged
+        outside_vertices.remove(out_i)
+        outside_vertices.remove(out_j)
+        outside_vertices.append(out_new)
+    G.relabel()
     return G
 
 
 def random_orientation(G, max_path_len):
-    '''FUnkcja tworząca losowe acykliczne skierowanie grafu `G`, którego długość najdłuższej ścieżki skierowanej jest
+    '''Funkcja tworząca losowe acykliczne skierowanie grafu `G`, którego długość najdłuższej ścieżki skierowanej jest
     mniejsza lub równa `max_path_len`.
 
     :param G: Graph
         Graf, którego skierowanie jest losowane.
     :param max_path_len: Int
         Największa długość ścieżki skierowanej w wyjściowym grafie.
-    :return:
-        Acykliczny graf skierowany.
+    :return: tuple
+        Para składająca się z acyklicznego grafu skierowanego, oraz długości jego najdłuższej ścieżki skierowanej.
     '''
     good_orientation = False
     while not good_orientation:
