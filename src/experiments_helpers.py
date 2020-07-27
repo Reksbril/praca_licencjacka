@@ -7,12 +7,15 @@ from src.homomorphism import compressibility_number
 
 import numpy as np
 from time import time
+import warnings
 
 
-def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, paths_type, min_cycle_len=1):
+def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_cycle_len=1):
     '''Funkcja losująca grafy nieskierowane o dokładnie jedym cyklu, z którego wychodzą ścieżki dwóch typów.
     Pierwszym z nich jest typ "zewnętrzny", czyli ścieżki, które zaczynają się w jednym z wierzchołków cyklu i których
-    pozostałe wierzchołki są z cyklem rozłączne. Drugi typ jest "wewnętrzny" TODO dokończyć opis
+    pozostałe wierzchołki są z cyklem rozłączne. Drugi typ jest "wewnętrzny", do którego należą ścieżki o dwóch
+    wierzchołkach końcowych należących do cyklu lub innej ścieżki wewnętrznej. Wszystkie ścieżki wewnętrzne są losowane
+    tak, żeby graf był planarny pod warukiem, że rysowanie ścieżek wewnętrznych ograniczamy do wnętrza cyklu.
 
     :param min_cycle_len: Int
         Minimalna dozwolona długość cyklu.
@@ -22,26 +25,37 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, paths_type
     :param max_path_len: Int
         Największa dozwolona długość ścieżki wychodzącej z cyklu.
     :param p: Float
-        Określa, z jakim prawdopodobieństwem do grafu zostanie dodana kolejna ścieżka wychodząca.
+        Określa, z jakim prawdopodobieństwem do grafu zostanie dodana kolejna ścieżka zewnętrzna. Z prawdopodobieństwem
+        `1-p` zostanie dodana krawędź wewnętrzna.
     :param max_vertices: Int
         Największa dozwolona liczba krawędzi.
     :return: tuple
         Para składająca się z opisanego grafu skierowanego, oraz długości jego najdłuższej ścieżki.
     '''
+    if p < 0 or p > 1:
+        raise ValueError("Niepoprawna wartość prawdopodobieństwa. `p` musi należeć do przedziału [0, 1]")
     if min_cycle_len < 1:
         raise ValueError("Minimalna długość cyklu nie może być mniejsza od 1.")
     if min_cycle_len > max_cycle_len:
         raise ValueError("Minimalna długość cyklu musi być mniejsza lub równa maksymalnej.")
+    if min_cycle_len < 3 and p < 1:
+        warnings.warn("Minimalna długość cyklu pozwala na stworzenie cykli bez wnętrza, a wartość `p` dopuszcza"
+                      "istnienie ścieżek wewnętrznych. W przypadku wylosowania krótkiego cyklu, wszystkie ścieżki"
+                      "będą zewnętrzne.")
     G = Graph()
     cycle_len = np.random.randint(min_cycle_len, max_cycle_len + 1)
     if cycle_len == 1:
+        p = 1
         G.add_vertex(0)
     elif cycle_len == 2:
+        p = 1
         G.add_edge((0, 1))
     else:
+        print(list(range(0, cycle_len)))
         G.add_cycle(list(range(0, cycle_len)))
     n = cycle_len
     got_max_vertices = n >= max_vertices
+    cycle_partitions = [list(range(0, n))]
     for i in range(cycle_len):
         if got_max_vertices:
             break
@@ -51,15 +65,41 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, paths_type
             if n + path_length > max_vertices:
                 path_length = max_vertices - n
                 got_max_vertices = True
-            G.add_path([i] + list(range(n, n + path_length)))
+            if path_length == 0:
+                if got_max_vertices:
+                    break
+                else:
+                    continue
+            if np.random.rand(1) > p:
+                available_parts = [tab for tab in cycle_partitions if i in tab]
+                cycle_part = available_parts[np.random.randint(0, len(available_parts))]
+                j = i
+                while j == i:
+                    j = np.random.choice(cycle_part)
+                # split
+                k = 0
+                parts = [[], []]
+                part_id = 0
+                new_path = list(range(n, n + path_length - 1))
+                for k in cycle_part:
+                    parts[part_id].append(k)
+                    if k in [i, j]:
+                        if k == i:
+                            parts[part_id] += new_path
+                        else:
+                            parts[part_id] += new_path[::-1]
+                        part_id = 1 - part_id
+                        parts[part_id].append(k)
+                cycle_partitions.remove(cycle_part)
+                cycle_partitions.append(parts[0])
+                cycle_partitions.append(parts[1])
+                G.add_path([i] + new_path + [j])
+            else:
+                G.add_path([i] + list(range(n, n + path_length)))
             n += path_length
             if got_max_vertices:
                 break
     return G
-
-
-def random_cycle_paths_inside(max_cycle_len, max_path_len, max_vertices, min_cycle_len=1):
-
 
 
 def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_path_len, min_cycle_len=1):
@@ -87,8 +127,9 @@ def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_
                                    min_cycle_len=min_cycle_len,
                                    max_path_len=int(max_path_len/2),
                                    max_vertices=int(max_vertices/n_cycles))
-        G = G.disjoint_union(H)
-    G.relabel()
+        #G = G.disjoint_union(H)
+        G=H
+    #G.relabel()
     connected_components = G.connected_components()
     while len(connected_components) > 1:
         i, j = np.random.choice(range(len(connected_components)), size=2, replace=False)
@@ -111,17 +152,17 @@ def random_orientation(G, max_path_len):
         Acykliczny graf skierowany.
     '''
     good_orientation = False
-    while not good_orientation: # przeważnie za 1 albo 2 razem
+    while not good_orientation:
         DiG = G.random_orientation()
         longest_path_len = len(DiG.longest_path().edges())
         good_orientation = DiG.is_directed_acyclic() and longest_path_len <= max_path_len
     return DiG, longest_path_len
 
 
-def check_compressibility_many(graphs, save_results = None):
+def check_compressibility_many(graphs_iterator, save_results = None):
     '''Funkcja liczy kompresyjność dla grafów podanych na wejściu.
 
-    :param graphs_generator:
+    :param graphs_iterator:
         Iterator, za pomocą którego wytwarzane są kolejne grafy. Powinien zwracać parę `(G, i)`, gdzie `G` jest grafem
         skierowanym, a `i` jest długością najdłuższej ścieżki skierowanej w `G`.
     :param save_results: string
@@ -134,7 +175,7 @@ def check_compressibility_many(graphs, save_results = None):
     result = []
     if save_results is not None:
         graphs = []
-    for G, longest_path_len in graphs:
+    for G, longest_path_len in graphs_iterator:
         if save_results is not None:
             graphs.append(G.dig6_string())
         compressibility = compressibility_number(G)
@@ -144,6 +185,7 @@ def check_compressibility_many(graphs, save_results = None):
         file = open(save_results, 'w')
         file.writelines(lines_to_write)
     return result
+
 
 def plot_graphs(file_in, dir_out, compressibility=None, path_len=None, compr_path_diff=None):
     '''Funkcja rysująca grafy, które zostały zapisane w pliku 'file_in' i spełniające kryteria określone przez
