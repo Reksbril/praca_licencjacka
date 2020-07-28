@@ -10,7 +10,7 @@ from time import time
 import warnings
 
 
-def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_cycle_len=1):
+def random_cycle_paths(max_cycle_len, max_path_len, max_vertices, p=0, min_cycle_len=1):
     '''Funkcja losująca grafy nieskierowane o dokładnie jedym cyklu, z którego wychodzą ścieżki dwóch typów.
     Pierwszym z nich jest typ "zewnętrzny", czyli ścieżki, które zaczynają się w jednym z wierzchołków cyklu i których
     pozostałe wierzchołki są z cyklem rozłączne. Drugi typ jest "wewnętrzny", do którego należą ścieżki o dwóch
@@ -106,8 +106,8 @@ def random_cycle_paths_out(max_cycle_len, max_path_len, max_vertices, p=0, min_c
     return G, outside_vertices
 
 
-def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_path_len, min_cycle_len=1):
-    '''Generuje `n_cycles` rozłącznch cykli według procedury opisanej w `random_cycle_paths_out`. Następnie łączy
+def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_path_len, p, min_cycle_len=1):
+    '''Generuje `n_cycles` rozłącznch cykli według procedury opisanej w `random_cycle_paths`. Następnie łączy
     te cykle poprzez scalanie kolejnych losowo wybranych wierzchołków, dopóki graf nie będzie spójny.
 
     :param n_cycles: Int
@@ -122,16 +122,20 @@ def random_multiple_cycles_connected(n_cycles, max_vertices, max_cycle_len, max_
         cyklach generowanych na samym początku, a nie w ostatecznym grafie.
     :param min_cycle_len:
         Minimalna długość generowanych cykli.
+    :param p: Float:
+        Określa, z jakim prawdopodobieństwem do grafu zostanie dodana kolejna ścieżka zewnętrzna. Z prawdopodobieństwem
+        `1-p` zostanie dodana krawędź wewnętrzna. Opis typów ścieżek znajduje się w opisie `random_cycle_paths`.
     :return:
         Spójny graf nieskierowany
     '''
     G = Graph()
     outside_vertices = []
     for i in range(n_cycles):
-        H, out = random_cycle_paths_out(max_cycle_len=max_cycle_len,
-                                   min_cycle_len=min_cycle_len,
-                                   max_path_len=int(max_path_len/2),
-                                   max_vertices=int(max_vertices/n_cycles))
+        H, out = random_cycle_paths(max_cycle_len=max_cycle_len,
+                                    min_cycle_len=min_cycle_len,
+                                    max_path_len=int(max_path_len/2),
+                                    max_vertices=int(max_vertices/n_cycles),
+                                    p=p)
         outside_vertices.append([(i, v) for v in out])
         H.relabel(lambda v: (i, v))
         G = G.union(H)
@@ -172,7 +176,7 @@ def random_orientation(G, max_path_len):
     return DiG, longest_path_len
 
 
-def check_compressibility_many(graphs_iterator, save_results = None):
+def check_compressibility_many(graphs_iterator, upper_bound, save_results = None):
     '''Funkcja liczy kompresyjność dla grafów podanych na wejściu.
 
     :param graphs_iterator:
@@ -181,9 +185,13 @@ def check_compressibility_many(graphs_iterator, save_results = None):
     :param save_results: string
         Plik, do którego zapisane zostaną dane w postaci
         "<graf w formacie dig6> <kompresyjność grafu> <długość najdłuższej ścieżki w grafie>" linijka po linijce
+    :param upper_bound: Int
+        Liczba, do której jest liczona kompresyjność. Jeżeli okaże się, że jest ona wyższa, to zwracane jest -1.
     :return: list
         Lista o długości równej liczbie wygenerowanych grafów składająca się z tupli
-        (kompresyjnośc grafu, długość najdłuższej ścieżki w grafie)
+        (kompresyjnośc grafu, długość najdłuższej ścieżki w grafie).
+        Górna granica, do której sprawdzana jest kompresyjność to 9, ze względu bardzo długi czas trwania obliczeń
+        powyżej tej liczby.
     '''
     result = []
     if save_results is not None:
@@ -191,10 +199,10 @@ def check_compressibility_many(graphs_iterator, save_results = None):
     for G, longest_path_len in graphs_iterator:
         if save_results is not None:
             graphs.append(G.dig6_string())
-        compressibility = compressibility_number(G)
+        compressibility = compressibility_number(G, upper_bound=upper_bound)
         result.append((compressibility, longest_path_len))
     if save_results is not None:
-        lines_to_write = ["%s %d %d\n" % (graphs[i], result[i][0], result[i][1]) for i in range(n_checks)]
+        lines_to_write = ["%s %d %d\n" % (graphs[i], result[i][0], result[i][1]) for i in range(len(graphs))]
         file = open(save_results, 'w')
         file.writelines(lines_to_write)
     return result

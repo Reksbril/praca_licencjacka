@@ -136,8 +136,10 @@ class Homomorphism():
         :return: True wtw G jest homomorficzny z T
         '''
         G, T = rm_sinks_and_sources(self.G, T, True, G_vertices=self._vertices, G_degrees=self.degrees)
+        if G.current_vertex_count() == 0:
+            return True #TODO zmienić na overleafie
         if T.current_vertex_count() == 0:
-            return G.current_vertex_count() == 0
+            return False
         sorted_G = G.topological_sort()
 
         def assign(i, A):
@@ -168,10 +170,14 @@ class Homomorphism():
         return assign(0, A)
 
 
-def compressibility_number(G):
+def compressibility_number(G, upper_bound=10):
     '''Fukcja implementująca główny algrytm.
-    :param G: Graf skierowany
-    :return: Kompresyjność dla G. Zwraca -1, jeżeli kompresyjność jest większa od 10
+    :param G:
+        Graf skierowany
+    :param upper_bound:
+        Górna granica, powyżej której kompresyjność nie jest sprawdzana.
+    :return:
+        Kompresyjność dla G. Zwraca -1, jeżeli kompresyjność jest większa od `upper_bound`.
     '''
     homomorphism_helper = Homomorphism(G)
 
@@ -182,7 +188,8 @@ def compressibility_number(G):
     def check_homomorphism(is_homomorphic_method, graphs_generator):
         nonlocal i
         nonlocal T
-        while i <= 10:
+        nonlocal upper_bound
+        while i <= upper_bound:
             found_not_homomorphic = False
             T_next = []
             for H in graphs_generator(i):
@@ -190,11 +197,12 @@ def compressibility_number(G):
                 if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
                     continue
                 if is_homomorphic_method(H):
-                    if i < 10: # dla i == 10 nie potrzebujemy zapisywać, bo wyżej już nie sprawdzamy
+                    if i < upper_bound:# and len(T_next) < 10: #TODO poprawić w pseudokodzie
                         T_next.append(H)
                 else:
                     found_not_homomorphic = True
-                    break
+                    if i > 5:
+                        break
             if found_not_homomorphic:
                 i += 1
                 T = T + T_next
@@ -203,4 +211,4 @@ def compressibility_number(G):
 
     check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle, lambda x: tournament_iterator(x, 'one_cycle'))
     check_homomorphism(homomorphism_helper.homomorphic_to_tournament, lambda x: tournament_iterator(x, 'more_cycles'))
-    return i if i <= 10 else -1
+    return i if i <= upper_bound else -1
