@@ -137,7 +137,7 @@ class Homomorphism():
         '''
         G, T = rm_sinks_and_sources(self.G, T, True, G_vertices=self._vertices, G_degrees=self.degrees)
         if G.current_vertex_count() == 0:
-            return True #TODO zmienić na overleafie
+            return True
         if T.current_vertex_count() == 0:
             return False
         sorted_G = G.topological_sort()
@@ -197,7 +197,7 @@ def compressibility_number(G, upper_bound=10):
                 if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
                     continue
                 if is_homomorphic_method(H):
-                    if i < upper_bound:# and len(T_next) < 10: #TODO poprawić w pseudokodzie
+                    if i < upper_bound:
                         T_next.append(H)
                 else:
                     found_not_homomorphic = True
