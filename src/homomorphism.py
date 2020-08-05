@@ -1,11 +1,14 @@
 import sage.all
 from sage.graphs.digraph import DiGraph
-from sage.graphs.connectivity import connected_components_subgraphs, is_connected
+from sage.graphs.connectivity import \
+    connected_components_subgraphs, is_connected
 
 from src.helpers import *
 
+
 class Homomorphism():
-    '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju homomorfizmy.
+    '''Klasa pomocnicza, przechowująca metody sprawdzające różnego rodzaju
+    homomorfizmy.
     '''
 
     def __init__(self, G):
@@ -19,7 +22,7 @@ class Homomorphism():
             'source': G.sources()
         }
 
-    def is_homomorphic_to_C_three(self, G = None):
+    def is_homomorphic_to_C_three(self, G=None):
         '''Sprawdza, czy graf G jest homomorficzny z C_3. G nie musi być
         spójny.
 
@@ -35,8 +38,7 @@ class Homomorphism():
                 return False
         return True
 
-
-    def connected_is_homomorphic_to_C_three(self, G = None):
+    def connected_is_homomorphic_to_C_three(self, G=None):
         '''Sprawdza czy spójny G jest homomorficzny z C_3. Implementacja
         Algorytmu 1 z [1]
 
@@ -74,7 +76,6 @@ class Homomorphism():
 
         return color(G.vertices()[0], 0)
 
-
     def is_homomorphic_one_cycle(self, T):
         '''Sprawdza czy G jest homomorficzny z turniejem T.
         T musi zawierać dokładnie jeden cykl skierowany. W
@@ -86,10 +87,10 @@ class Homomorphism():
             raise ValueError("T musi być turniejem i zawierać dokładnie "
                              "jeden cykl skierowany.")
 
-        G = rm_sinks_and_sources(self.G, T, G_vertices=self._vertices, G_degrees=self.degrees).get_current()
-        #to co zostało, to pewien graf G, oraz T będący cyklem C_3
+        G = rm_sinks_and_sources(self.G, T, G_vertices=self._vertices,
+                                 G_degrees=self.degrees).get_current()
+        # to co zostało, to pewien graf G, oraz T będący cyklem C_3
         return self.is_homomorphic_to_C_three(G)
-
 
     def is_homomorphic_to_transitive_k(self, k):
         '''Funkcja zwraca True wtw G jest homomorficzny z turniejem
@@ -97,17 +98,17 @@ class Homomorphism():
         '''
         if not self.G.is_directed_acyclic():
             raise ValueError("G musi być skierowany i acykliczny.")
-        #krawędzie w T są skierowane od wierzchołka o mniejszym
-        #indeksie do wierzchołka o większym indeksie
-        colors = dict() #kolory przyporządkowane wierzchołkom
-        color = k #obecny kolor
-        vertices = self.G.sinks() #wierzchołki, które w danym obrocie pętli będą kolorowane
+        # krawędzie w T są skierowane od wierzchołka o mniejszym
+        # indeksie do wierzchołka o większym indeksie
+        colors = dict()  # kolory przyporządkowane wierzchołkom
+        color = k  # obecny kolor
+        vertices = self.G.sinks()  # wierzchołki, które w danym obrocie pętli
+        # będą kolorowane
         ex = DiGraphExtended(self.G)
 
         while len(vertices) > 0 and color > 0:
             for v in vertices:
-                #jeżeli wierzchołek ma już kolor, to sprzeczność
-                #TODO raczej nie będzie zachodzić, ale na razie zostawię
+                # jeżeli wierzchołek ma już kolor, to sprzeczność
                 if v in colors:
                     return False
                 colors[v] = color
@@ -115,7 +116,6 @@ class Homomorphism():
             vertices = ex.step('sink')
 
         return len(colors) == len(self.G.vertices())
-
 
     def homomorphic_to_transitive(self):
         '''Funkcja która liczy najmniejsze k takie że G jest homomorficzny
@@ -127,15 +127,16 @@ class Homomorphism():
                 return k
             k += 1
 
-
     def homomorphic_to_tournament(self, T):
-        '''Funkcja sprawdzająca, czy G jest homomorficzny z dowolnym turniejem T. Jeżeli T ma mniej niż 2 cykle, powinniśmy
+        '''Funkcja sprawdzająca, czy G jest homomorficzny z dowolnym turniejem
+        T. Jeżeli T ma mniej niż 2 cykle, powinniśmy
         używać powyżej zaimplementowanych metod
         :param G: Dowolny graf skierowany, acykliczny
         :param T: Dowolny turniej
         :return: True wtw G jest homomorficzny z T
         '''
-        G, T = rm_sinks_and_sources(self.G, T, True, G_vertices=self._vertices, G_degrees=self.degrees)
+        G, T = rm_sinks_and_sources(self.G, T, True, G_vertices=self._vertices,
+                                    G_degrees=self.degrees)
         if G.current_vertex_count() == 0:
             return True
         if T.current_vertex_count() == 0:
@@ -144,7 +145,8 @@ class Homomorphism():
 
         def assign(i, A):
             if i == len(sorted_G) - 1:
-                # W tym przypadku lista A[v] jest niepusta, więc istnieje dopasowanie dla v.
+                # W tym przypadku lista A[v] jest niepusta, więc istnieje
+                # dopasowanie dla v.
                 return True
             v = sorted_G[i]
             for w in A[v]:
@@ -165,7 +167,6 @@ class Homomorphism():
                     A[z] = A_prev[z]
             return False
 
-
         A = {v: set(T.vertices()) for v in G.vertices()}
         return assign(0, A)
 
@@ -177,7 +178,8 @@ def compressibility_number(G, upper_bound=10):
     :param upper_bound:
         Górna granica, powyżej której kompresyjność nie jest sprawdzana.
     :return:
-        Kompresyjność dla G. Zwraca -1, jeżeli kompresyjność jest większa od `upper_bound`.
+        Kompresyjność dla G. Zwraca -1, jeżeli kompresyjność jest większa
+        od `upper_bound`.
     '''
     homomorphism_helper = Homomorphism(G)
 
@@ -194,7 +196,8 @@ def compressibility_number(G, upper_bound=10):
             T_next = []
             for H in graphs_generator(i):
                 # Sprawdzamy, czy H zawiera którykolwiek z grafów w T
-                if any(map(lambda x: all(H.has_edge(e) for e in x.edge_iterator()), T)):
+                if any(map(lambda x:
+                           all(H.has_edge(e) for e in x.edge_iterator()), T)):
                     continue
                 if is_homomorphic_method(H):
                     if i < upper_bound:
@@ -209,6 +212,8 @@ def compressibility_number(G, upper_bound=10):
             else:
                 break
 
-    check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle, lambda x: tournament_iterator(x, 'one_cycle'))
-    check_homomorphism(homomorphism_helper.homomorphic_to_tournament, lambda x: tournament_iterator(x, 'more_cycles'))
+    check_homomorphism(homomorphism_helper.is_homomorphic_one_cycle,
+                       lambda x: tournament_iterator(x, 'one_cycle'))
+    check_homomorphism(homomorphism_helper.homomorphic_to_tournament,
+                       lambda x: tournament_iterator(x, 'more_cycles'))
     return i if i <= upper_bound else -1

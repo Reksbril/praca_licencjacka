@@ -11,7 +11,9 @@ import os
 Plik zawierający funkcje pomocnicze
 '''
 
+
 PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 def iterator_has_exactly_one_element(it):
     '''Zwraca True wtw iterator it ma dokładnie jeden element.
@@ -25,6 +27,7 @@ def iterator_has_exactly_one_element(it):
     except StopIteration:  # 1 element
         return True
     return False
+
 
 def tournament_iterator(i, cycles):
     '''Iterator po grafach o jednym, lub co najmniej dwóch cyklach skierowanych
@@ -61,6 +64,7 @@ def has_exactly_one_cycle_tournament(G):
         else:
             break
     return G_ex.current_vertex_count() == 3
+
 
 def tournament_with_one_cycle(k, sink):
     '''Zwraca turniej z dokładnie jednym cyklem. Warto zauważyć
@@ -106,7 +110,7 @@ def tournament_with_one_cycle(k, sink):
     return T
 
 
-def rm_sinks_and_sources(G, T, keep_T = False, G_degrees = None, G_vertices = None):
+def rm_sinks_and_sources(G, T, keep_T=False, G_degrees=None, G_vertices=None):
     '''Zwraca kopię grafu G jako DiGraphExtended, która ma
     usunięte wszystkie źródła i ujścia, zgodnie z uwagą pod Algorytmem 2 w [1].
 
@@ -124,11 +128,14 @@ def rm_sinks_and_sources(G, T, keep_T = False, G_degrees = None, G_vertices = No
         da niepoprawny wynik!
     '''
 
-    exG = DiGraphExtended(G, keep_removed=True, degrees=deepcopy(G_degrees), vertices=deepcopy(G_vertices))
+    exG = DiGraphExtended(G, keep_removed=True, degrees=deepcopy(G_degrees),
+                          vertices=deepcopy(G_vertices))
 
     T_vertices = {'sink': T.sinks(), 'source': T.sources()}
-    if len(T_vertices['sink']) == 0 and len(T_vertices['source']) == 0: # tablica degrees jest wtedy bezużyteczna
-        exT = DiGraphExtended(T, keep_removed=keep_T, vertices=T_vertices, degrees={})
+    if len(T_vertices['sink']) == 0 and len(T_vertices['source']) == 0:
+        # tablica degrees jest wtedy bezużyteczna
+        exT = DiGraphExtended(T, keep_removed=keep_T, vertices=T_vertices,
+                              degrees={})
     else:
         exT = DiGraphExtended(T, keep_removed=keep_T, vertices=T_vertices)
 
@@ -148,6 +155,7 @@ def rm_sinks_and_sources(G, T, keep_T = False, G_degrees = None, G_vertices = No
             exG.step(next_step)
         except RuntimeError:
             pass
+
 
 def transitive_tournament(n):
     '''Zwraca turniej tranzytywny, którego krawędzie są sierowane od

@@ -36,9 +36,9 @@ def test_homomorphic_to_transitive():
 
 
 @pytest.mark.parametrize("T", [
-    DiGraph([(0, 1), (1, 2), (2, 0), (1, 3)]), # nie jest turniejem
-    digraphs.TransitiveTournament(4), # jest turniejem bez cykli
-    DiGraph([(0, 1), (1, 2), (2, 0), (1, 3), (3, 2), (3, 0)]) # turniej z większą liczbą cykli
+    DiGraph([(0, 1), (1, 2), (2, 0), (1, 3)]),  # nie jest turniejem
+    digraphs.TransitiveTournament(4),  # jest turniejem bez cykli
+    DiGraph([(0, 1), (1, 2), (2, 0), (1, 3), (3, 2), (3, 0)])  # więcej cykli
 ])
 def test_one_cycle_wrong_T_argument(T):
     G = DiGraph(1)
@@ -99,6 +99,7 @@ def test_tree_homomorphic_to_tournaments():
     for T in digraphs.tournaments_nauty(5):
         assert Homomorphism(G).homomorphic_to_tournament(T)
 
+
 @pytest.mark.parametrize('k', [3, 4])
 def test_tree_not_homomorphic_to_transitive(k):
     G = DiGraph([(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4),
@@ -109,7 +110,8 @@ def test_tree_not_homomorphic_to_transitive(k):
 
 
 @pytest.mark.parametrize('edges', [
-    [(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4), (7, 6), (0, 8), (8, 9), (8, 10), (10, 11), (11, 12), (13, 7)],
+    [(0, 1), (1, 2), (1, 3), (0, 4), (4, 5), (6, 4), (7, 6), (0, 8), (8, 9),
+     (8, 10), (10, 11), (11, 12), (13, 7)]
 ])
 @pytest.mark.parametrize('expected', [5])
 def test_compressibility(edges, expected):

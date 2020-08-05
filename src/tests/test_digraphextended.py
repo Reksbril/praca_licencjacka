@@ -14,9 +14,10 @@ def test_no_sinks(type):
     with pytest.raises(RuntimeError):
         ex.step(type)
 
+
 @pytest.mark.parametrize('case', [
-    {'type' : 'sink', 'vertices' : [3, 2, 1, 0]},
-    {'type' : 'source', 'vertices' : [1, 2, 3, 4]}
+    {'type': 'sink', 'vertices': [3, 2, 1, 0]},
+    {'type': 'source', 'vertices': [1, 2, 3, 4]}
 ])
 def test_extended_tournament(case):
     T = digraphs.TransitiveTournament(5)
@@ -34,6 +35,7 @@ def test_sinks_sources_simple():
     assert ex.sources() == [0]
     assert ex.sinks() == [1]
 
+
 def test_sinks_then_source():
     G = DiGraph([
         (0, 1), (0, 2)
@@ -41,14 +43,16 @@ def test_sinks_then_source():
     ex = DiGraphExtended(G)
     assert ex.step('sink') == [0]
 
+
 def test_sinks_then_source_duplicates():
     G = DiGraph([
-        [0, 1, 2], #wierzchołki
-        [(1, 2)] #krawędzie
+        [0, 1, 2],  # wierzchołki
+        [(1, 2)]  # krawędzie
     ], format='vertices_and_edges')
     ex = DiGraphExtended(G)
     ex.step('sink')
     assert ex.sources() == [1]
+
 
 def test_get_current():
     G = DiGraph(
@@ -60,6 +64,7 @@ def test_get_current():
     expected = DiGraph([(0, 1)], format='list_of_edges')
     assert result == expected
 
+
 def test_vertex_count():
     G = DiGraph(
         [(0, 1), (1, 2), (1, 3), (1, 4)],
@@ -70,6 +75,7 @@ def test_vertex_count():
     expected = 2
     assert result == expected
 
+
 def test_neighbors_out():
     G = DiGraph(
         [(0, 1), (1, 2), (1, 3), (1, 4), (4, 3)],
@@ -79,6 +85,7 @@ def test_neighbors_out():
     result = ex.neighbors_out(1)
     expected = [4]
     assert result == expected
+
 
 def test_neighbors_in():
     G = DiGraph(

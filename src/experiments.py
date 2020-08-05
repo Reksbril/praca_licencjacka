@@ -11,21 +11,24 @@ N = 10
 max_cycle_len = 7
 max_oriented_path_len = 5
 
+
 def experiments_iterator(p, j):
     for i in range(N):
+        max_path_len = int(max_cycle_len/2)+1
         G = random_multiple_cycles_connected(n_cycles=j,
                                              max_vertices=max_vertices,
                                              max_cycle_len=max_cycle_len,
-                                             max_path_len=int(max_cycle_len/2)+1,
+                                             max_path_len=max_path_len,
                                              p=p,
                                              min_cycle_len=3)
         G, l = random_orientation(G, max_oriented_path_len)
-        print("(%.1f, %d): generated %s for i=%d" %(p, j, G.dig6_string(), i))
+        print("(%.1f, %d): generated %s for i=%d" % (p, j, G.dig6_string(), i))
         yield G, l
 
 
 PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../results/"
 PLOTS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../plots/"
+
 
 def generate_and_calculate():
     for p in [1, 0.5, 0]:
@@ -33,10 +36,12 @@ def generate_and_calculate():
         for j in range(1, max_n_cycles + 1):
             out_file = "%.1f:%d.out" % (p, j)
             process = mp.Process(target=check_compressibility_many,
-                           args=(experiments_iterator(p, j), ),
-                           kwargs={"upper_bound":8, "save_results":PATH + out_file})
+                                 args=(experiments_iterator(p, j), ),
+                                 kwargs={"upper_bound": 8,
+                                         "save_results": PATH + out_file})
             processes.append(process)
             process.start()
+
 
 def plot_hist(ax, data, title, save_file, xlabel=True):
     bins = np.array([0, 1, 2, 3, 4, 5])
@@ -51,7 +56,8 @@ def plot_hist(ax, data, title, save_file, xlabel=True):
 
     ax.set_title(title)
     if xlabel:
-        ax.set_xlabel("Różnica pomiędzy kompresyjnością, a długością najdłuższej ścieżki skierowanej.")
+        ax.set_xlabel("Różnica pomiędzy kompresyjnością, a długością "
+                      "najdłuższej ścieżki skierowanej.")
     ax.set_ylabel("Liczba grafów")
 
 
@@ -104,7 +110,8 @@ def plots_p_1_diff_cycles():
             diff_tab.append(diff)
 
         cykl = "cykl" if j == 1 else "cykle"
-        plot_hist(axs[int((j-1)/2), (j-1)%2], diff_tab, "%d %s" % (j, cykl), "hist:1.0:%d.png" % j, False)
+        plot_hist(axs[int((j-1)/2), (j-1) % 2], diff_tab, "%d %s" % (j, cykl),
+                  "hist:1.0:%d.png" % j, False)
 
     for ax in axs.flat:
         ax.label_outer()
@@ -141,6 +148,7 @@ def plot_density():
     plt.savefig(PLOTS_PATH + "density.png")
 
     plt.show()
+
 
 def plot_triangles():
     triangles_num = []

@@ -17,7 +17,8 @@ if __name__ == '__main__':
         more = []
         transitive = False  # czy już napotkany był turniej tranzytywny
         print("Generating graphs with %d vertices..." % i)
-        for H in tqdm(digraphs.tournaments_nauty(i), total=graphs_counts[i - 3], file=sys.stdout):
+        for H in tqdm(digraphs.tournaments_nauty(i),
+                      total=graphs_counts[i - 3],file=sys.stdout):
             if not transitive and H.is_transitive():
                 transitive = True
                 continue

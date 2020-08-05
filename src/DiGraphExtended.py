@@ -2,6 +2,7 @@ import sage.all
 from sage.graphs.digraph import DiGraph
 from copy import copy
 
+
 class DiGraphExtended():
     '''Klasa odpowiedzialna za pamiętanie, które z wierzchołków
     kopii danego grafu skierowanego są ujściami, a które źródłami.
@@ -23,19 +24,19 @@ class DiGraphExtended():
         klasy dadzą niepoprawne wyniki!
     '''
 
-    def __init__(self, G, keep_removed = False, degrees = None, vertices = None):
+    def __init__(self, G, keep_removed=False, degrees=None, vertices=None):
         self.G = G
         if degrees is None:
             self.degrees = {
-                'sink' : G.out_degree(labels=True),
-                'source' : G.in_degree(labels=True)
+                'sink': G.out_degree(labels=True),
+                'source': G.in_degree(labels=True)
             }
         else:
             self.degrees = degrees
         if vertices is None:
             self._vertices = {
-                'sink' : G.sinks(),
-                'source' : G.sources()
+                'sink': G.sinks(),
+                'source': G.sources()
             }
         else:
             self._vertices = vertices
@@ -81,13 +82,15 @@ class DiGraphExtended():
         self._vertices[rm_type] = result
         if self.keep_removed:
             self.removed += to_remove
-        self._neighbors_out = {} # Po wykonaniu jakiejkolwiek modyfikacji, usuwa cache
+        self._neighbors_out = {}  # Po wykonaniu jakiejkolwiek modyfikacji,
+        # usuwa cache
         self._neighbors_in = {}
         return result
 
     def _remove_duplicates(self, rm_type, other):
-        '''Usuwa wszystkie źródła jednocześnie będące ujściami (rm_type = 'source')
-        lub odwrotnie (rm_type = 'sink'). other jest drugim z typów.
+        '''Usuwa wszystkie źródła jednocześnie będące ujściami
+        (rm_type = 'source') lub odwrotnie (rm_type = 'sink'). other jest
+        drugim z typów.
         '''
         self._vertices[rm_type] = list(
             set(self._vertices[rm_type]) - set(self._vertices[other]))
@@ -140,7 +143,8 @@ class DiGraphExtended():
                              "zapamiętane usunięte wierzchołki.")
 
         if v not in self._neighbors_out:
-            self._neighbors_out[v] = list(set(self.G.neighbors_out(v)) - set(self.removed))
+            self._neighbors_out[v] = list(set(self.G.neighbors_out(v)) -
+                                          set(self.removed))
         return self._neighbors_out[v]
 
     def neighbors_in(self, v):
@@ -151,7 +155,8 @@ class DiGraphExtended():
                              "zapamiętane usunięte wierzchołki.")
 
         if v not in self._neighbors_in:
-            self._neighbors_in[v] = list(set(self.G.neighbors_in(v)) - set(self.removed))
+            self._neighbors_in[v] = list(set(self.G.neighbors_in(v)) -
+                                         set(self.removed))
         return self._neighbors_in[v]
 
     def topological_sort(self):
