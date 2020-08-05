@@ -1,39 +1,13 @@
 # Praca licencjacka
 
+Implementacja algorytmu stanowiącego część pracy licencjackiej. 
+Wykorzystuje bibliotekę [SAGE](http://doc.sagemath.org/html/en/index.html).
+
 ## Układ
 Katalog *src/* zawiera wszystkie pliki źródłowe, wraz z testami, które znajdują się w *src/tests/*. Katalog 
 *tournaments/* zawiera wszystkie turnieje, które są używane w algorytmach. Można je wygenerować, uruchamiają skrypt
-*generate_tournaments.sh*
+*generate_tournaments.sh*. Skrypt *run_tests.sh* pozwala zaś na uruchomienie wszystkich testów jednostkowych.
 
-Repozytorium implementacji algorytmu stanowiącego część pracy licencjackiej. 
-Wykorzystuje bibliotekę [SAGE](http://doc.sagemath.org/html/en/index.html).
+W katalogu *plots/* znajdują się wszystkie wykresy wykorzystane w pracy. 
 
-## Algorytm
-Wejście: graf skierowany *G* \
-Wyjście: compressibility number dla *G* tzn. najmniejsze *k* takie że *G* jest homomorficzny z każdym turniejem na *k* 
-wierzchołkach
-
-1. Szukamy *i* takiego że nasz graf jest homomorficzny z turniejem tranzytywnym na *i* wierzchołkach.
-2. Zaczynając od *i*, szukamy najmniejszego *j* takiego, że *G* jest homomorficzny z turniejem na *j* wierzchołkach, 
-który ma dokładnie jeden cykl skierowany.
-3. Zaczynając od *j*, szukamy najmniejszego *k* takiego, że *G* jest homomorficzny z każdym turniejem
-
-
-##### AD 1
-Korzystamy z algorytmu 2 z [1].
-
-#### AD 2
-Wykorzystamy uwagę zamieszczoną pod opisem Algorytmu 2 w [1]. TODO: doprecyzować
-Jednocześnie warto wykorzystać to, że jeżeli sprawdzany turniej zawiera w sobie turniej tranzytywny o *i* wierzchołkach,
-to *G* jest z nim homomorficzny.
-
-#### AD 3
-Na razie trzeba będzie zrobić po prostu Brute-force. Jedyną rzeczą, jaką będziemy mogli wykorzystać jest fakt,
-że jeżeli badany turniej zawiera turniej już sprawdzony wyżej, to mamy od razu homomorfizm.
-
-
-
-
-
-# Bibliografia
-[1] Hell, Pavol. (2020). Algorithmic aspects of graph homomorphisms. 
+Katalog *results/* zawiera wyniki eksperymentów, na których oparty jest ostatni dział pracy.
