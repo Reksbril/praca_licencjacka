@@ -15,6 +15,12 @@ from src.helpers import *
 
 if __name__ == '__main__':
     graphs_counts = [1, 1, 2, 4, 12, 56, 456, 6880, 191536, 9733056]
+    if not os.path.exists(PATH + "/../tournaments"):
+        os.mkdir(PATH + "/../tournaments")
+    if not os.path.exists(PATH + "/../tournaments/one_cycle"):
+        os.mkdir(PATH + "/../tournaments/one_cycle")
+    if not os.path.exists(PATH + "/../tournaments/more_cycles"):
+        os.mkdir(PATH + "/../tournaments/more_cycles")
     for i in range(1, 11):
         one = []
         more = []

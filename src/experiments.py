@@ -1,9 +1,15 @@
+import sage.all
+from sage.graphs.graph_generators import graphs
+
 import pathlib
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 from collections import Counter
 
 from src.experiments_helpers import *
+
+import os
+import time
 
 max_n_cycles = 4
 max_vertices = 30
@@ -25,10 +31,14 @@ def experiments_iterator(p, j):
         print("(%.1f, %d): generated %s for i=%d" % (p, j, G.dig6_string(), i))
         yield G, l
 
-
 PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../results/"
 PLOTS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../plots/"
 
+if not os.path.exists(PATH):
+    os.mkdir(PATH)
+
+if not os.path.exists(PLOTS_PATH):
+    os.mkdir(PLOTS_PATH)
 
 def generate_and_calculate():
     for p in [1, 0.5, 0]:
@@ -181,7 +191,37 @@ def plot_triangles():
     plt.show()
 
 
-plots_p()
-plots_p_1_diff_cycles()
-plot_density()
-plot_triangles()
+def measure_time(n, m, N):
+    times = []
+    for j in range(1, m + 1):
+        print(j)
+        total = 0
+        for i in range(N):
+            G = graphs.RandomGNM(n, j)
+            DiG, _ = random_orientation(G, 9)
+            start = time.time()
+            compressibility_number(DiG, upper_bound=10)
+            end = time.time()
+            total += end - start
+        times.append(total / N)
+    return times
+
+def plot_time():
+    n = 10
+    m = 12
+    N = 10
+    times = measure_time(n, m, N)
+    plt.plot(list(range(1, m + 1)), times)
+    plt.xlabel("Liczba krawędzi")
+    plt.ylabel("Średni czas obliczania kompresyjności (s)")
+    plt.title("Czas obliczania kompresyjności dla losowych grafów")
+    plt.savefig(PLOTS_PATH + "time.png")
+    plt.show()
+
+if __name__ == "__main__":
+    generate_and_calculate()
+    plots_p()
+    plots_p_1_diff_cycles()
+    plot_density()
+    plot_triangles()
+    plot_time()
