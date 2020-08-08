@@ -5,12 +5,11 @@ import pathlib
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 from collections import Counter
-import os
-import sys
-PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, PATH + "/..")
+
 from src.experiments_helpers import *
 
+import os
+import sys
 
 import time
 
@@ -224,8 +223,8 @@ def plot_time():
 
 if __name__ == "__main__":
     #generate_and_calculate()
-    #plots_p()
-    #plots_p_1_diff_cycles()
-    #plot_density()
-    #plot_triangles()
+    plots_p()
+    plots_p_1_diff_cycles()
+    plot_density()
+    plot_triangles()
     plot_time()
