@@ -5,10 +5,13 @@ import pathlib
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 from collections import Counter
-
+import os
+import sys
+PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, PATH + "/..")
 from src.experiments_helpers import *
 
-import os
+
 import time
 
 max_n_cycles = 4
@@ -193,22 +196,23 @@ def plot_triangles():
 
 def measure_time(n, m, N):
     times = []
-    for j in range(1, m + 1):
+    for j in range(14, m + 1):
         print(j)
         total = 0
         for i in range(N):
             G = graphs.RandomGNM(n, j)
             DiG, _ = random_orientation(G, 9)
             start = time.time()
-            compressibility_number(DiG, upper_bound=10)
+            compressibility_number(DiG, upper_bound=9)
             end = time.time()
             total += end - start
+        print(total/N)
         times.append(total / N)
     return times
 
 def plot_time():
     n = 10
-    m = 12
+    m = 13
     N = 10
     times = measure_time(n, m, N)
     plt.plot(list(range(1, m + 1)), times)
@@ -219,9 +223,9 @@ def plot_time():
     plt.show()
 
 if __name__ == "__main__":
-    generate_and_calculate()
-    plots_p()
-    plots_p_1_diff_cycles()
-    plot_density()
-    plot_triangles()
+    #generate_and_calculate()
+    #plots_p()
+    #plots_p_1_diff_cycles()
+    #plot_density()
+    #plot_triangles()
     plot_time()
